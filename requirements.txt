@@ -1,0 +1,9 @@
+# pip index versions NOMEPACOTE
+chromadb==0.4.24
+langchain==0.1.14
+langchain-community==0.0.31
+langchain-core==0.1.40
+langchain-openai==0.1.1
+langsmith==0.1.41
+pypdf==4.2.0
+ipykernel==6.29.4
