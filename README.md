@@ -24,3 +24,15 @@ python -m venv .venv
 ```
 pip install -r ./requirements.txt
 ```
+
+## Utilizar o Genie
+Após o ambiente configurado é possível usar o "genie" que é um Chat com o GPT para ser utilizado no Terminal.  
+Para abrir, digite
+```
+# Linux
+python3 genie/genie.py
+
+# Windows
+python genie/genie.py
+```
+![Genie Compliance](./examples/image1.png)
