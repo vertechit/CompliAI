@@ -5,6 +5,5 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 COPY CSVs /code/app
 COPY PDFs /code/app
 COPY *.py /code/app
-COPY .env /code/app
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
