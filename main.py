@@ -65,7 +65,6 @@ app = FastAPI()
 
 @app.post("/piada")
 def retornaMensagem(mensagem=Body()):
-    print(mensagem)
     return {"retorno": chainPiada(mensagem)}
 
 @app.post("/chain")
