@@ -10,3 +10,4 @@ ipykernel==6.29.4
 bs4==0.0.2
 langchainhub==0.1.15
 oracledb==2.1.2
+qdrant-client==1.8.2

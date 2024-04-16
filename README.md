@@ -36,3 +36,8 @@ python3 genie/genie.py
 python genie/genie.py
 ```
 ![Genie Compliance](./examples/image1.png)
+
+### Rodar a imagem Docker
+```
+docker run -p 8080:80 -e OPENAI_API_KEY="....." myimage
+```
