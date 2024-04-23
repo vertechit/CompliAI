@@ -44,3 +44,13 @@ docker run -p 8080:80 -e OPENAI_API_KEY="....." devcst/compliai
 # Teste de chamada da API
 curl -X POST http://127.0.0.1:8080/chain --data "Quem é o presidente do brasil?"
 ```
+
+### Subir aplicação inteira
+```
+docker compose up
+```
+
+### Subir o Genie no Docker
+```
+docker exec -it compliai-api-1 python3 /code/app/genie/genie.py
+```
