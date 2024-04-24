@@ -13,3 +13,4 @@ oracledb==2.1.2
 qdrant-client==1.8.2
 peewee==3.17.3
 colorama==0.4.6
+psycopg2-binary==2.9.9
