@@ -3,16 +3,6 @@ from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from models.ChatHistory import ChatHistory
 
-ChatHistory.drop_table()
-ChatHistory.create_table()
-
-#history1 = ChatHistory(session_id=123, mensagem="Mensagem do sistema", tipo=0)
-#history1.save()
-#history2 = ChatHistory(session_id=123, mensagem="Mensagem do Humano", tipo=1)
-#history2.save()
-#history3 = ChatHistory(session_id=123, mensagem="Mensagem do Robo", tipo=2)
-#history3.save()
-
 def insertHistory(sessionId: int, mensagem: str, tipo: int):
     hist = ChatHistory(session_id=sessionId, mensagem=mensagem, tipo=tipo)
     hist.save()

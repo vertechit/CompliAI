@@ -13,7 +13,7 @@ from colorama import Fore, Back, Style
 import time
 from genie.src.extras import greeting, lamp
 from genie.src.prompts import chains
-from llm.llm import chain, chainPiada, chainWithHistory
+from llm.llm import chain, chainPiada, chainWithHistory, chainRetriever, chainRetrieverWithHistory
 
 """
 Genie: A Python implementation of OpenAI's ChatGPT integrated into your shell.
@@ -34,6 +34,10 @@ def callChain(input: str)-> str:
         return chainPiada(input)
     elif mainChain==2:
         return chain(input)
+    elif mainChain==3:
+        return chainRetriever(input)
+    elif mainChain==4:
+        return chainRetrieverWithHistory(input, 123)
     else:
         return chainWithHistory(input, 123)
 

@@ -1,6 +1,8 @@
 chains = [
     "Chain de piada:\nEssa Chain irá fazer uma piada sobre qualquer assunto perguntado",
     "Chain simples:\nEssa Chain irá fazer uma consulta simples para a LLM sem guardar histórico",
+    "Chain Retriever:\nEssa Chain irá fazer uma consulta simples para a LLM sem guardar histórico",
+    "Chain Retriever com Histórico:\nEssa Chain irá fazer uma consulta simples para a LLM sem guardar histórico",
     "Chain com Histórico:\nEssa Chain irá armazenar o histórico das conversas feitas no chat",
 ]
 
