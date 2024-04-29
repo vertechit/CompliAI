@@ -6,8 +6,8 @@ import uuid
 from langchain_core.documents.base import Document
 from typing import List
 
-_url = os.environ["QDRANT_URL"]
-_api_key = os.environ["QDRANT_API_KEY"]
+_url = os.getenv("QDRANT_URL")
+_api_key = os.getenv("QDRANT_API_KEY")
 _collectionName='compliAI'
 
 _embeddings_model = OpenAIEmbeddings()

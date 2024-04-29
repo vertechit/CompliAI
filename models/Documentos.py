@@ -16,6 +16,7 @@ class Documentos(peewee.Model):
     descricao = peewee.CharField()
     md5 = peewee.CharField()
     arquivo = peewee.BlobField(null=True)
+    url = peewee.CharField(null=True)
     class Meta:
         database = db
         
