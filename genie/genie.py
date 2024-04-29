@@ -4,16 +4,17 @@ import openai
 import sys
 import random
 import string
-import colorama
 import shutil
 import argparse
 import readline
 import os
+from types import NoneType
 from colorama import Fore, Back, Style
 import time
-from genie.src.extras import greeting, lamp
-from genie.src.prompts import chains
+from genie.src.extras import lamp
+from genie.src.prompts import opcoes, chains
 from llm.llm import chain, chainPiada, chainWithHistory, chainRetriever, chainRetrieverWithHistory
+from controllers.DocumentsController import saveDocument, deleteDocumento, listDocumentos
 
 """
 Genie: A Python implementation of OpenAI's ChatGPT integrated into your shell.
@@ -67,7 +68,25 @@ def main():
 
     def display_prompt_menu():
         term_width = shutil.get_terminal_size((80, 20)).columns
-        num_columns = 3
+        num_columns = 5
+        column_width = term_width // num_columns
+        formatted_prompts = []
+
+        for i, prompt in enumerate(opcoes):
+            formatted_prompt = f"{prompt.split(':')[0]}"
+            padded_prompt = formatted_prompt.center(column_width)
+            formatted_prompts.append(padded_prompt)
+
+        print(Fore.YELLOW + "=" * term_width)
+        for i, formatted_prompt in enumerate(formatted_prompts):
+            print(Fore.YELLOW + formatted_prompt, end="")
+            if (i + 1) % num_columns == 0 and i != len(formatted_prompts) - 1:
+                print()
+        print(Fore.YELLOW + "\n" + "=" * term_width + Style.RESET_ALL)
+        
+    def display_prompt_chain():
+        term_width = shutil.get_terminal_size((80, 20)).columns
+        num_columns = 5
         column_width = term_width // num_columns
         formatted_prompts = []
 
@@ -76,11 +95,6 @@ def main():
             padded_prompt = formatted_prompt.center(column_width)
             formatted_prompts.append(padded_prompt)
 
-        print(
-            Fore.YELLOW
-            + "Escolha a Chain desejada, 'q' para sair ou '/menu' para mostrar as opções:".center(term_width)
-            + "\n"
-        )
         print(Fore.YELLOW + "=" * term_width)
         for i, formatted_prompt in enumerate(formatted_prompts):
             print(Fore.YELLOW + formatted_prompt, end="")
@@ -110,73 +124,104 @@ def main():
         padding_left = (term_width - len(text)) // 2
         print(" " * padding_left + text, end="")
 
+    def parse_commands(menu):
+        comando = menu.split(" ")
+        if comando[0] == "/chain":
+            if len(comando) == 2:
+                opcao = int(comando[1]) 
+                changeChain(opcao)
+            else:
+                print(Fore.MAGENTA + "Valor inválido, selecione uma das opções desejada")
+                print(Fore.MAGENTA + f"Chain atual: {chains[mainChain - 1]}")
+                display_prompt_chain()
+        elif comando[0] == "/addDoc":
+            comando = menu[8:].split(",")
+            if len(comando) == 3:
+                print(Fore.MAGENTA + saveDocument(comando[0].strip(), comando[1].strip(), comando[2].strip()))
+            else:
+                print(Fore.MAGENTA + "Para inserir um documento é preciso passar 3 parâmetros, \"Caminho do arquivo\", \"Título do Arquivo\" e \"Descrição do Arquivo\", os campos devem ser separados por \",\"")
+        elif comando[0] == "/delDoc":
+            if len(comando) == 2:
+                opcao = int(comando[1]) 
+                deleteDocumento(opcao)
+                print(Fore.MAGENTA + f"Documento {opcao} deletado com sucesso!")
+            else:
+                print(Fore.MAGENTA + "Para deletar o documento é preciso passar o ID do documento")
+        elif comando[0] == "/listDoc":
+            documentos = listDocumentos(None)
+            print()
+
+            term_width = shutil.get_terminal_size((80, 20)).columns
+            num_columns = 6
+            column_width = term_width // num_columns
+            formatted_prompts = ["| documento_id".ljust(column_width)[:column_width], "| titulo".ljust(column_width)[:column_width], "| descricao".ljust(column_width)[:column_width], "| md5".ljust(column_width)[:column_width], "| url".ljust(column_width)[:column_width], "| chunks".ljust(column_width)[:column_width]]
+
+            print(Fore.MAGENTA + "-" * term_width)
+            header = ""
+            for formatted_prompt in formatted_prompts:
+                header += formatted_prompt
+
+            print(Fore.MAGENTA + header.ljust(term_width)[:term_width])
+            print(Fore.MAGENTA + "-" * term_width)
+            
+            for documento in documentos:
+                line = ""
+                for doc in documento:
+                    if isinstance(doc, str):
+                        line += str("| "+doc).ljust(column_width)[:column_width]
+                    if isinstance(doc, NoneType):
+                        line += str("| ").ljust(column_width)[:column_width]
+                    elif isinstance(doc, int):
+                        line += str("| "+str(doc)).ljust(column_width)[:column_width]
+                    elif isinstance(doc, list):
+                        line += str("| Quantidade: "+str(len(doc))).ljust(column_width)[:column_width]
+                print(Fore.MAGENTA + line.ljust(term_width)[:term_width])
+            print()
+        elif comando[0] == "/clearHist":
+            print(Fore.MAGENTA + menu)
+        elif comando[0] == "/menu":
+            display_prompt_menu()
+        else:
+            print(Fore.MAGENTA + f"Comando \"{menu}\" não encontrado")
+            display_prompt_menu()
+            
+        
     args = parse_args()
-
-    messages = []
-
-    randomgreeting = random.choice(greeting)
 
     if args.question:
         prompt = " ".join(args.question).rstrip(string.punctuation)
     else:
         print(Fore.YELLOW + center_multiline_string(random.choice(lamp)))
 
-        reply: str = ""
         prompt: str = ""
         
         display_prompt_menu()
-        print(Fore.BLUE + "Você: ", end="")
-        user_input = get_user_input(Fore.BLUE + "")
-        if user_input.strip().isdigit() and 1 <= int(user_input.strip()) <= len(chains):
-            changeChain(int(user_input.strip()))
-        else:
-            prompt = user_input.strip()
 
     while True:
+        prompt = get_user_input(Fore.BLUE + "Você: ")
+        
         if prompt.lower() in ["quit", "q", "bye"]:
             print(
                 Fore.YELLOW
                 + "\nCompliAI: "
-                + "Farewell, master. Until you drag me out of bed again...\n"
+                + "Até mais...\n" + Style.RESET_ALL 
             )
             break
         
         if len(prompt) > 0:
-            response = callChain(prompt)
-            reply = response
-        
-        if len(reply) > 0:
-            print(Fore.GREEN + "\nCompliAI: ", end='')
-            for element in reply:
-                time.sleep(0.01)
-                print(element, end='', flush=True)
-            print("\n")
-
-        if args.question:
-            break
-        else:
-            prompt = get_user_input(Fore.BLUE + "Você: ")
-            
-            if len(prompt) > 0 and prompt.lower()[0] == "/":
-                comando = prompt.lower().split(" ")
-                if comando[0] == "/chain":
-                    if int(comando[1]) > 0:
-                        changeChain(int(comando[1]))
-                    else:
-                        print(Fore.MAGENTA + "Valor inválido, selecione uma das opções desejada")
-                        display_prompt_menu()
-                elif comando[0] == "/menu":
-                    display_prompt_menu()
-                    user_input = get_user_input(Fore.BLUE + "Escolha a Chain desejada ou 'q' para sair: ".center(shutil.get_terminal_size((80, 20)).columns)).strip()
-                    if user_input.isdigit() and 1 <= int(user_input) <= len(chains):
-                        changeChain(int(user_input))
-                        prompt = ""
-                        reply = ""
-                    else:
-                        prompt = ""
-                        reply = ""
-                prompt = ""
-                reply = ""
+            if prompt.lower()[0] == "/":
+                parse_commands(prompt)
+            else:
+                if len(prompt) > 0:
+                    response = callChain(prompt)
+                
+                if len(response) > 0:
+                    print(Fore.GREEN + "\nCompliAI: ", end='')
+                    for element in response:
+                        time.sleep(0.01)
+                        print(element, end='', flush=True)
+                    print("\n")
+                    response = ""
 
 if __name__ == "__main__":
     main()

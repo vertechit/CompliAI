@@ -47,7 +47,7 @@ curl -X POST http://127.0.0.1:8080/chain --data '{"HumamMessage": "Quem é o pre
 
 ### Subir aplicação inteira
 ```
-docker compose up
+docker compose up --build
 ```
 
 ### Subir o Genie no Docker
