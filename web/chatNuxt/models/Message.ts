@@ -1,8 +1,33 @@
+import {v4} from 'uuid'
+export interface IMessage {
+    id:string
+    userId:number
+    message:string
+    date:string
+    type: 'request' | 'response' | 'user'
+}
 export default class Messages {
-    constructor(
-        public id:string,
-        public message:string,
-        public  date:string
-    ){}
 
+    listMensage:IMessage[] = []
+    constructor(){}
+
+    addMessage(message:IMessage){
+        this.listMensage.push({
+            ...message,
+            id:v4(),
+            date:new Date().toLocaleDateString(`pt-br`,{month:'long',day:'2-digit', year:'numeric'}),
+        })
+    }
+    addDotsLoading(){
+        this.listMensage.push({
+            id:v4(),
+            type:'request',
+            date:new Date().toLocaleDateString(`pt-br`,{month:'long',day:'2-digit', year:'numeric'}),
+            message:'',
+            userId:0
+        })
+    }
+    removeDotLoading(){
+        this.listMensage = this.listMensage.filter(messages => messages.type !== 'request')
+    }
 }
