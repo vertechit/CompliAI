@@ -36,3 +36,21 @@ python3 genie/genie.py
 python genie/genie.py
 ```
 ![Genie Compliance](./examples/image1.png)
+
+### Rodar a imagem Docker
+```
+docker run -p 8080:80 -e OPENAI_API_KEY="....." devcst/compliai
+
+# Teste de chamada da API
+curl -X POST http://127.0.0.1:8080/chain --data '{"HumamMessage": "Quem é o presidente do Brasil?"}' -H "content-type: application/json"
+```
+
+### Subir aplicação inteira
+```
+docker compose up
+```
+
+### Subir o Genie no Docker
+```
+docker exec -it compliai-api-1 python3 main.py
+```

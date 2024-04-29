@@ -1,11 +1,126 @@
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_openai import ChatOpenAI
+from fastapi import Body, FastAPI, UploadFile
+from pydantic import BaseModel, Field
+from genie.genie import main
+from llm.llm import chain, chainWithHistory, chainPiada, chainRetriever, chainRetrieverWithHistory
+from controllers.DocumentsController import saveDocument, deleteDocumento, listDocumentos
+from typing import List
+import tempfile
+import os
 
-def chain(input: str) -> str:
-    prompt = ChatPromptTemplate.from_template("Me conte uma piada sobre {assunto}")
-    model = ChatOpenAI(model="gpt-3.5-turbo")
-    output_parser = StrOutputParser()
+from models import ChatHistory, Documentos
+from vectors import vectorStore
+
+tags_metadata = [
+    {"name": "LLMs", "description": "Chamadas para as LLMs"},
+    {"name": "Documentos", "description": "Cadastros de documentos"},
+]
+app = FastAPI(openapi_tags=tags_metadata)
+
+class InputChat(BaseModel):
+    SystemMessage: str | None = Field(default=None, examples=["Responde de forma educada"])
+    HumamMessage: str = Field(examples=["Quem é o presidente do Brasil?"])
     
-    chain = (prompt | model | output_parser)
-    return chain.invoke({"assunto":input})
+class ResponseChat(BaseModel):
+    AiMessage: str = Field(examples=["Presidente do brasil é o Lula"])
+
+class ChunkObj(BaseModel):
+    chunks_id: int
+    id_vector: str
+    md5: str
+        
+class DocumentoObj(BaseModel):
+    documento_id: int
+    titulo: str
+    descricao: str
+    md5: str
+    chunks: List[ChunkObj]
+
+def destroyDatabases():
+    vectorStore.dropCollection()
+    if ChatHistory.ChatHistory.table_exists():
+        ChatHistory.ChatHistory.drop_table()
+    if Documentos.Documentos.table_exists():
+        Documentos.Documentos.drop_table()
+    if Documentos.Chunks.table_exists():
+        Documentos.Chunks.drop_table()
+
+def initDatabases():
+    vectorStore.createCollection()
+    if not ChatHistory.ChatHistory.table_exists():
+        ChatHistory.ChatHistory.create_table()
+    if not Documentos.Documentos.table_exists():
+        Documentos.Documentos.create_table()
+    if not Documentos.Chunks.table_exists():
+        Documentos.Chunks.create_table()
+
+if os.getenv("RECREATE_DB", 0) == 1:
+    destroyDatabases()
+initDatabases()
+
+@app.post("/piada", tags=["LLMs"])
+def retornaMensagem(mensagem=Body()):
+    return {"retorno": chainPiada(mensagem)}
+
+@app.post("/chain", tags=["LLMs"])
+def retornaMensagem(chat: InputChat)-> ResponseChat:
+    ret = chain(chat.HumamMessage)
+    response = ResponseChat(AiMessage=ret)
+    return response
+
+@app.post("/chainHistory/{sessionId}", tags=["LLMs"])
+def retornaMensagem(sessionId: int, chat: InputChat)-> ResponseChat:
+    ret = chainWithHistory(chat.HumamMessage, sessionId)
+    response = ResponseChat(AiMessage=ret)
+    return response
+
+@app.post("/chainRetriever", tags=["LLMs"])
+def retornaMensagem(sessionId: int, chat: InputChat)-> ResponseChat:
+    ret = chainRetriever(chat.HumamMessage)
+    response = ResponseChat(AiMessage=ret)
+    return response
+
+@app.post("/chainRetrieverHistory/{sessionId}", tags=["LLMs"])
+def retornaMensagem(sessionId: int, chat: InputChat)-> ResponseChat:
+    ret = chainRetrieverWithHistory(chat.HumamMessage, sessionId)
+    response = ResponseChat(AiMessage=ret)
+    return response
+
+@app.get("/listDocument", tags=["Documentos"])
+def listaDocumento()-> List[DocumentoObj] | None:
+    ret: List[DocumentoObj] = []
+    documentos = listDocumentos(None)
+    if len(documentos) == 0:
+        return None
+    for doc in documentos:
+        chunk = [ChunkObj(chunks_id=chunkLoop[0], id_vector=chunkLoop[1], md5=chunkLoop[2]) for chunkLoop in doc[4]]
+        ret.append(DocumentoObj(documento_id=doc[0], titulo=doc[1], descricao=doc[2], md5=doc[3], chunks=chunk))
+    return ret
+
+@app.get("/listDocument/{documento_id}", tags=["Documentos"])
+def listaDocumento(documento_id: int = None)-> DocumentoObj | None:
+    ret: DocumentoObj = None
+    documentos = listDocumentos(documento_id)
+    if len(documentos) == 0:
+        return None
+    for doc in documentos:
+        chunk = [ChunkObj(chunks_id=chunkLoop[0], id_vector=chunkLoop[1], md5=chunkLoop[2]) for chunkLoop in doc[4]]
+        ret = DocumentoObj(documento_id=doc[0], titulo=doc[1], descricao=doc[2], md5=doc[3], chunks=chunk)
+    return ret
+
+@app.post("/createDocument/", tags=["Documentos"])
+async def uploadFile(file: UploadFile | None, filename: str, description: str):
+    contents = await file.read()
+    arquivoTemp = tempfile.gettempdir()+"/"+file.filename
+    print(tempfile.gettempdir())
+    with open(arquivoTemp, "wb") as f:
+        f.write(contents)
+    documento = saveDocument(arquivoTemp, filename, description)
+    return {"retorno": documento}
+
+@app.delete("/deleteDocument/{documento_id}", tags=["Documentos"])
+def deletaDocumento(documento_id: int):
+    deleteDocumento(documento_id)
+    return {"retorno": "Deletado"}
+
+if __name__ == "__main__":
+    main()
