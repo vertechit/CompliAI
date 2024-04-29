@@ -46,6 +46,7 @@ curl -X POST http://127.0.0.1:8080/chain --data '{"HumamMessage": "Quem é o pre
 ```
 
 ### Subir aplicação inteira
+Para subir a aplicação copie o arquivo `example.env` para o arquivo `.env` e substitua os valores das chaves de API antes de subir a aplicação
 ```
 docker compose up --build
 ```
