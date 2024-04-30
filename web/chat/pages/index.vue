@@ -1,8 +1,8 @@
 
 <template>
     <main class="flex flex-col h-screen">
-        <div class="overflow-y-auto m-0 flex-grow" ref="chatContainer">
-            <chat :mensages="MessagesModel.listMensage"></chat>
+        <div class="overflow-y-auto flex-grow" ref="chatContainer">
+            <cMessages :messages="MessagesModel.listMensage"></cMessages>
         </div>
         <div class="mt-auto">
             <div class="sticky bottom-0 bg-white py-2 w-full  border-t-2 pt-2">
@@ -17,7 +17,7 @@
   import {nextTick} from 'vue'
   import Messages from '@/models/Message'
   import FooterInputMensages from '@/components/footer/inputMensages.vue'
-  import chat from '@/components/chat.vue'
+  import cMessages from '@/components/messages.vue'
   import {defaultStore} from '@/stores/default'
   const chatContainer: Ref<HTMLElement | null> = ref(null);
 
@@ -28,10 +28,18 @@
     try {
       MessagesModel.value.addMessage({date:'',id:'',type:'user',userId:1,message})
       MessagesModel.value.addDotsLoading()
-       await  wait(1000)
-       MessagesModel.value.removeDotLoading()
+      let result = await $fetch('/api/chain',{
+        method:'POST',
+        body:{
+          "SystemMessage": "Responde de forma educada",
+          "HumamMessage": message
+        }
+      }) as { AiMessage: string}
+      await MessagesModel.value.removeDotLoading()
+      MessagesModel.value.addMessage({date:'',id:'',type:'response',userId:5,message:result.AiMessage})
     } catch (error) {
       console.log(error)
+      await MessagesModel.value.removeDotLoading()
     }finally{
       setLoading(false)
     }
@@ -48,10 +56,9 @@
   }
   watch(MessagesModel.value.listMensage,async()=> {
     await nextTick();
-  scrollToBottom();
+    scrollToBottom();
   })
 const scrollToBottom = () => {
-  console.log(chatContainer.value)
   if (chatContainer.value) {
     chatContainer.value.scrollTop = chatContainer.value.scrollHeight ;
   }

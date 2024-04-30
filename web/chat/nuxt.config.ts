@@ -15,7 +15,7 @@ tailwindcss:{
 },
 runtimeConfig:{
   public:{
-    baseURL:process.env.baseURL || ''
+    baseURL:process.env.WEB_BASE_URL || ''
   }
 }
 })

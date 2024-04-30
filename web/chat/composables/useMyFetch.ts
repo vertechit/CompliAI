@@ -32,7 +32,8 @@ export const useMyFetch = (url: string, options: FetchOptions) => {
         async onRequest({ request, options }) {
 
             const { baseURL } = runTimeConfig.public
-            // options.baseURL = baseURL
+            console.log(baseURL)
+            options.baseURL = baseURL
             options.headers = options.headers || {}
 
             // if (userStore?.userData) options.headers.authorization = 'Bearer ' + userStore?.userData?.token?.accessToken

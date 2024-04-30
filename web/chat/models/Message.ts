@@ -27,7 +27,7 @@ export default class Messages {
             userId:0
         })
     }
-    removeDotLoading(){
-        this.listMensage = this.listMensage.filter(messages => messages.type !== 'request')
+    async removeDotLoading(){
+        this.listMensage.pop()
     }
 }
