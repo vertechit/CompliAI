@@ -54,3 +54,9 @@ docker compose up --build
 ```
 docker exec -it compliai-api-1 python3 main.py
 ```
+
+### WebChat disponivel em :
+OBS : ENV do chat inserir do DockerFile
+```
+http://localhost:3000
+```
