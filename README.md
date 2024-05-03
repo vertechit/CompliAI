@@ -43,6 +43,13 @@ docker run -p 8080:80 -e OPENAI_API_KEY="....." devcst/compliai
 
 # Teste de chamada da API
 curl -X POST http://127.0.0.1:8080/chain --data '{"HumamMessage": "Quem é o presidente do Brasil?"}' -H "content-type: application/json"
+
+# Anexar documento
+curl -X 'POST' \
+  'http://127.0.0.1:8080/createDocument/?filename=Document%201&description=Descricao%20de%20documento%201' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'file=@/mnt/c/dev/Repositorios/CompliAI/arquivos/salarios.csv'
 ```
 
 ### Subir aplicação inteira
@@ -61,3 +68,9 @@ OBS : ENV do chat inserir do DockerFile
 ```
 http://localhost:3000
 ```
+
+### Links
+QDRant Dashboard: http://localhost:6333/dashboard
+Adminer: http://localhost:8081/
+API: http://localhost:8080/docs
+WebApp: http://localhost/
