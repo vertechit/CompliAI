@@ -1,4 +1,4 @@
-name: Publish Docker image
+name: Publish Docker for WEB
 
 on:
     push:
@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
+        with:
+          path: 'web/chat'
 
       - name: Log in to Docker Hub
         uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
@@ -22,7 +24,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
         with:
-          context: ./web/chat/
-          file: Dockerfile
+          context: .
+          file: ./Dockerfile
           push: true
           tags: "devcst/compliaiweb"
