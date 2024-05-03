@@ -1,5 +1,8 @@
 *.db
 
+#Adicionado pasta do WEB APP pois ela será adicionada em outro docker
+web/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
