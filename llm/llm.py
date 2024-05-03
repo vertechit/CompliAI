@@ -16,6 +16,22 @@ def chainPiada(input: str) -> str:
     chain = (prompt | model | output_parser)
     return chain.invoke({"assunto":input})
 
+def chainTitulo(input: str) -> str:
+    template =[
+        (
+            "system",
+            "Baseado na mensagem a seguir monte um titulo bem simplificado sobre a intenção da mensagem, mostre apenas o titulo"
+        ),
+        (
+            "human",
+            "{assunto}"
+        )
+        ]
+    prompt = ChatPromptTemplate.from_messages(template)
+    output_parser = StrOutputParser()
+    chain = (prompt | model | output_parser)
+    return chain.invoke({"assunto":input})
+
 def chain(input: str) -> str:
     prompt = ChatPromptTemplate.from_template("{assunto}")
     output_parser = StrOutputParser()
