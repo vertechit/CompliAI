@@ -56,6 +56,8 @@ curl -X 'POST' \
 Para subir a aplicação copie o arquivo `example.env` para o arquivo `.env` e substitua os valores das chaves de API antes de subir a aplicação
 ```
 docker compose up --build
+# Para habilitar o Watch
+docker compose watch
 ```
 
 ### Subir o Genie no Docker
