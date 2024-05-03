@@ -34,4 +34,4 @@ services:
   webchat:
     build: ./web/chat
     ports:
-      - "3000:3000"
+      - "80:3000"
