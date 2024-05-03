@@ -13,7 +13,7 @@ from colorama import Fore, Back, Style
 import time
 from genie.src.extras import lamp
 from genie.src.prompts import opcoes, chains
-from llm.llm import chain, chainPiada, chainWithHistory, chainRetriever, chainRetrieverWithHistory
+from llm.llm import chain, chainTitulo, chainPiada, chainWithHistory, chainRetriever, chainRetrieverWithHistory
 from controllers.DocumentsController import saveDocument, deleteDocumento, listDocumentos
 
 """
@@ -39,6 +39,8 @@ def callChain(input: str)-> str:
         return chainRetriever(input)
     elif mainChain==4:
         return chainRetrieverWithHistory(input, 123)
+    elif mainChain==5:
+        return chainTitulo(input)
     else:
         return chainWithHistory(input, 123)
 
@@ -68,7 +70,7 @@ def main():
 
     def display_prompt_menu():
         term_width = shutil.get_terminal_size((80, 20)).columns
-        num_columns = 5
+        num_columns = 3
         column_width = term_width // num_columns
         formatted_prompts = []
 
@@ -86,7 +88,7 @@ def main():
         
     def display_prompt_chain():
         term_width = shutil.get_terminal_size((80, 20)).columns
-        num_columns = 5
+        num_columns = 3
         column_width = term_width // num_columns
         formatted_prompts = []
 
@@ -177,7 +179,7 @@ def main():
                         line += str("| Quantidade: "+str(len(doc))).ljust(column_width)[:column_width]
                 print(Fore.MAGENTA + line.ljust(term_width)[:term_width])
             print()
-        elif comando[0] == "/clearHist":
+        elif comando[0] == "/sessao":
             print(Fore.MAGENTA + menu)
         elif comando[0] == "/menu":
             display_prompt_menu()
