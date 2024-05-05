@@ -32,18 +32,15 @@ def getDocuments(filepath: str)->List[Document]:
     elif(mimetype=="url"):
         bskwarg = {}
         if filepath.find('documentacao.compliancefiscal.com.br') > 0:
-            print(2)
             strainer1 = SoupStrainer(id='post')
             bskwarg = {
                 'parse_only': strainer1
             }
         elif filepath.find('docs.compliancecapitalhumano.com.br') > 0:
-            print(1)
             strainer2 = SoupStrainer(attrs="post")
             bskwarg = {
                 'parse_only': strainer2
             }
-        print(bskwarg)
         document = WebBaseLoader(filepath, bs_kwargs=bskwarg).load()
         document = text_splitter.split_documents(document)
     elif(mimetype=="dir"):
