@@ -13,7 +13,7 @@ from colorama import Fore, Back, Style
 import time
 from genie.src.extras import lamp
 from genie.src.prompts import opcoes, chains
-from llm.llm import chain, chainTitulo, chainPiada, chainWithHistory, chainRetriever, chainRetrieverWithHistory
+from llm.llm import chain, chainTitulo, chain_retriever_with_sources, chainPiada, chainWithHistory, chainRetriever, chainRetrieverWithHistory
 from controllers.DocumentsController import saveDocument, deleteDocumento, listDocumentos
 
 """
@@ -29,20 +29,30 @@ def changeChain(chainNumber: int):
     mainChain=chainNumber
     print(Fore.MAGENTA + "Alterdo Chain para " + chains[chainNumber-1].split(":")[0])
     
-def callChain(input: str)-> str:
+def callChain(input: str)-> dict:
     global mainChain
+    retorno = {
+        'pergunta': '',
+        'resposta': '',
+        'documentos': ''
+        }
     if mainChain==1:
-        return chainPiada(input)
+        retorno['reposta'] = chainPiada(input)
     elif mainChain==2:
-        return chain(input)
+        retorno['reposta'] = chain(input)
     elif mainChain==3:
-        return chainRetriever(input)
+        retorno['reposta'] = chainRetriever(input)
     elif mainChain==4:
-        return chainRetrieverWithHistory(input, 123)
+        retorno['reposta'] = chainRetrieverWithHistory(input, 123)
     elif mainChain==5:
-        return chainTitulo(input)
+        retorno['reposta'] = chainTitulo(input)
+    elif mainChain==6:
+        retorno1 = chain_retriever_with_sources(input)
+        retorno['reposta'] = retorno1['resposta']
+        retorno['documentos'] = retorno1['documentos']
     else:
-        return chainWithHistory(input, 123)
+        retorno['reposta'] = chainWithHistory(input, 123)
+    return retorno
 
     
 
@@ -216,10 +226,19 @@ def main():
             else:
                 if len(prompt) > 0:
                     response = callChain(prompt)
+                    
+                if len(response.get('documentos', None)) > 0:
+                    print(Fore.MAGENTA + "\nDocumentos utilizadoss: ")
+                    for element in response.get('documentos'):
+                        print("---------------")
+                        if element.metadata.get('titulo', None):
+                            print(f"Documento: {element.metadata['titulo']}")
+                        print(f'Conteúdo: {element.page_content}')
+                    print("\n")
                 
-                if len(response) > 0:
+                if len(response['reposta']) > 0:
                     print(Fore.GREEN + "\nCompliAI: ", end='')
-                    for element in response:
+                    for element in response['reposta']:
                         time.sleep(0.01)
                         print(element, end='', flush=True)
                     print("\n")

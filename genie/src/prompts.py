@@ -13,5 +13,6 @@ chains = [
     "Chain Retriever: Essa Chain irá fazer uma consulta simples para a LLM sem guardar histórico",
     "Chain Retriever com Histórico: Essa Chain irá fazer uma consulta simples para a LLM sem guardar histórico",
     "Chain com resumo: Essa chain irá resumir alguma coisa",
+    "Chain Retriever com Documentos: Essa chain irá retornar perguntas sobre os documentos e os documentos listados para formular a resposta",
     "Chain com Histórico: Essa Chain irá armazenar o histórico das conversas feitas no chat",
 ]
