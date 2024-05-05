@@ -6,7 +6,8 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from operator import itemgetter
 from controllers.ChatHistoryController import getChatMessasgeHistoryBySession, insertHistory
 from vectors.vectorStore import getRetriever
-from langchain_core.runnables import RunnablePassthrough
+from langchain_core.runnables import RunnablePassthrough, RunnableParallel
+import json
 
 model = ChatOpenAI(model="gpt-3.5-turbo")
 
@@ -120,4 +121,34 @@ def chainRetrieverWithHistory(input: str, sessionId: int)-> str:
         config={"configurable": {"session_id": sessionId}},
         )
     insertHistory(sessionId=sessionId, mensagem=ret, tipo=2)
+    return ret
+
+def chain_retriever_with_sources(input: str)-> dict:
+    template =[
+        (
+            "system",
+            """Responda a pergunta baseado somente no seguinte contexto
+            {context}
+            """
+        ),
+        (
+            "human",
+            "{question}"
+        )
+    ]
+
+    prompt = ChatPromptTemplate.from_messages(template)
+
+    chain = (
+        RunnablePassthrough.assign(context=itemgetter("documentos"), question=itemgetter("pergunta"))
+        | prompt
+        | model
+        | StrOutputParser()
+    )
+
+    abc = RunnableParallel(
+        {"documentos": getRetriever(), "pergunta": RunnablePassthrough()}
+    ).assign(resposta=chain)
+
+    ret = abc.invoke(input)
     return ret
