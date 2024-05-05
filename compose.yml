@@ -31,12 +31,12 @@ services:
     image: "qdrant/qdrant"
     ports:
       - "6333:6333"
-  webchat:
-    build: ./web/chat
-    ports:
-      - "80:3000"
-    develop:
-      watch:
-        - action: sync+restart
-          path: ./web/chat
-          target: /usr/src/app
+#  webchat:
+#    build: ./web/chat
+#    ports:
+#      - "80:3000"
+#    develop:
+#      watch:
+#        - action: sync+restart
+#          path: ./web/chat
+#          target: /usr/src/app

@@ -160,35 +160,53 @@ def main():
             else:
                 print(Fore.MAGENTA + "Para deletar o documento é preciso passar o ID do documento")
         elif comando[0] == "/listDoc":
-            documentos = listDocumentos(None)
-            print()
+            if len(comando) == 2:
+                documentos = listDocumentos(comando[1])
+                print()
+                
+                for documento in documentos:
+                    print(Fore.MAGENTA + "Documento ID:", documento[0])
+                    print(Fore.MAGENTA + "Titulo:", documento[1])
+                    print(Fore.MAGENTA + "Descrição:", documento[2])
+                    print(Fore.MAGENTA + "MD5:", documento[3])
+                    print(Fore.MAGENTA + "URL:", documento[4])
+                    print(Fore.MAGENTA + "Chunks: ")
+                    for chunk in documento[5]:
+                        print(Fore.MAGENTA + "-----------")
+                        print(Fore.MAGENTA + "Chunk ID:", chunk[0])
+                        print(Fore.MAGENTA + "Chunk ID Vector:", chunk[1])
+                        print(Fore.MAGENTA + "Conteudo:", chunk[3])
+                print()
+            else:
+                documentos = listDocumentos(None)
+                print()
 
-            term_width = shutil.get_terminal_size((80, 20)).columns
-            num_columns = 6
-            column_width = term_width // num_columns
-            formatted_prompts = ["| documento_id".ljust(column_width)[:column_width], "| titulo".ljust(column_width)[:column_width], "| descricao".ljust(column_width)[:column_width], "| md5".ljust(column_width)[:column_width], "| url".ljust(column_width)[:column_width], "| chunks".ljust(column_width)[:column_width]]
+                term_width = shutil.get_terminal_size((80, 20)).columns
+                num_columns = 6
+                column_width = term_width // num_columns
+                formatted_prompts = ["| documento_id".ljust(column_width)[:column_width], "| titulo".ljust(column_width)[:column_width], "| descricao".ljust(column_width)[:column_width], "| md5".ljust(column_width)[:column_width], "| url".ljust(column_width)[:column_width], "| chunks".ljust(column_width)[:column_width]]
 
-            print(Fore.MAGENTA + "-" * term_width)
-            header = ""
-            for formatted_prompt in formatted_prompts:
-                header += formatted_prompt
+                print(Fore.MAGENTA + "-" * term_width)
+                header = ""
+                for formatted_prompt in formatted_prompts:
+                    header += formatted_prompt
 
-            print(Fore.MAGENTA + header.ljust(term_width)[:term_width])
-            print(Fore.MAGENTA + "-" * term_width)
-            
-            for documento in documentos:
-                line = ""
-                for doc in documento:
-                    if isinstance(doc, str):
-                        line += str("| "+doc).ljust(column_width)[:column_width]
-                    if isinstance(doc, NoneType):
-                        line += str("| ").ljust(column_width)[:column_width]
-                    elif isinstance(doc, int):
-                        line += str("| "+str(doc)).ljust(column_width)[:column_width]
-                    elif isinstance(doc, list):
-                        line += str("| Quantidade: "+str(len(doc))).ljust(column_width)[:column_width]
-                print(Fore.MAGENTA + line.ljust(term_width)[:term_width])
-            print()
+                print(Fore.MAGENTA + header.ljust(term_width)[:term_width])
+                print(Fore.MAGENTA + "-" * term_width)
+                
+                for documento in documentos:
+                    line = ""
+                    for doc in documento:
+                        if isinstance(doc, str):
+                            line += str("| "+doc).ljust(column_width)[:column_width]
+                        if isinstance(doc, NoneType):
+                            line += str("| ").ljust(column_width)[:column_width]
+                        elif isinstance(doc, int):
+                            line += str("| "+str(doc)).ljust(column_width)[:column_width]
+                        elif isinstance(doc, list):
+                            line += str("| Quantidade: "+str(len(doc))).ljust(column_width)[:column_width]
+                    print(Fore.MAGENTA + line.ljust(term_width)[:term_width])
+                print()
         elif comando[0] == "/sessao":
             print(Fore.MAGENTA + menu)
         elif comando[0] == "/menu":

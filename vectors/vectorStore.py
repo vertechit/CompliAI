@@ -28,7 +28,8 @@ def loadDocuments(documents: List[Document])-> List[str]:
     return ids
 
 def deleteDocument(ids: List[str]):
-    _doc_store.delete(ids=ids)
+    if len(ids) > 0:
+        _doc_store.delete(ids=ids)
 
 def getVectoreStore()-> Qdrant:
     return _doc_store

@@ -29,7 +29,7 @@ def saveDocument(filepath: str | bytes, filename: str, descr: str)-> str:
         ids = loadDocuments(docs)
         for i, doc in enumerate(docs):
             md5 = hashlib.md5(doc.page_content.encode(encoding="utf-8")).hexdigest()
-            chunk = Chunks(id_vector=ids[i], md5=md5, documento_id=documento)
+            chunk = Chunks(id_vector=ids[i], md5=md5, documento_id=documento, conteudo=doc.page_content)
             chunk.save()
         return(f"Documento criado {documento}")
     else:
@@ -56,6 +56,6 @@ def listDocumentos(documento_id: int = None)-> List[Documentos]:
     else:
         docs = Documentos.select().where(Documentos.documento_id==documento_id)
     for doc in docs:
-        newDoc = (doc.documento_id, doc.titulo, doc.descricao, doc.md5, doc.url, [(chunk.chunks_id, chunk.id_vector, chunk.md5) for chunk in doc.chunks])
+        newDoc = (doc.documento_id, doc.titulo, doc.descricao, doc.md5, doc.url, [(chunk.chunks_id, chunk.id_vector, chunk.md5, chunk.conteudo) for chunk in doc.chunks])
         array.append(newDoc)
     return array
