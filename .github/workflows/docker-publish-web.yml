@@ -34,7 +34,9 @@ jobs:
           context: ./web/chat
           file: ./web/chat/Dockerfile
           push: true
-          tags: "devcst/compliaiweb"
+          tags: |
+            "devcst/compliaiweb"
+            "devcst/compliaiweb:${{github.run_number}}"
 
       - name: Build and push Docker image Branch
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
