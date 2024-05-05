@@ -24,6 +24,8 @@ def saveDocument(filepath: str | bytes, filename: str, descr: str)-> str:
         documento = Documentos(titulo=filename, descricao=descr, arquivo=fileBytes, md5=md5file, url=urlParam)
         documento.save()
         docs = getDocuments(filepath)
+        for doc in docs:
+            doc.metadata['titulo'] = filename
         ids = loadDocuments(docs)
         for i, doc in enumerate(docs):
             md5 = hashlib.md5(doc.page_content.encode(encoding="utf-8")).hexdigest()
