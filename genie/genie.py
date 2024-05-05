@@ -13,7 +13,7 @@ from colorama import Fore, Back, Style
 import time
 from genie.src.extras import lamp
 from genie.src.prompts import opcoes, chains
-from llm.llm import chain, chainPiada, chainWithHistory, chainRetriever, chainRetrieverWithHistory
+from llm.llm import chain, chainTitulo, chain_retriever_with_sources, chainPiada, chainWithHistory, chainRetriever, chainRetrieverWithHistory
 from controllers.DocumentsController import saveDocument, deleteDocumento, listDocumentos
 
 """
@@ -29,18 +29,30 @@ def changeChain(chainNumber: int):
     mainChain=chainNumber
     print(Fore.MAGENTA + "Alterdo Chain para " + chains[chainNumber-1].split(":")[0])
     
-def callChain(input: str)-> str:
+def callChain(input: str)-> dict:
     global mainChain
+    retorno = {
+        'pergunta': '',
+        'resposta': '',
+        'documentos': ''
+        }
     if mainChain==1:
-        return chainPiada(input)
+        retorno['reposta'] = chainPiada(input)
     elif mainChain==2:
-        return chain(input)
+        retorno['reposta'] = chain(input)
     elif mainChain==3:
-        return chainRetriever(input)
+        retorno['reposta'] = chainRetriever(input)
     elif mainChain==4:
-        return chainRetrieverWithHistory(input, 123)
+        retorno['reposta'] = chainRetrieverWithHistory(input, 123)
+    elif mainChain==5:
+        retorno['reposta'] = chainTitulo(input)
+    elif mainChain==6:
+        retorno1 = chain_retriever_with_sources(input)
+        retorno['reposta'] = retorno1['resposta']
+        retorno['documentos'] = retorno1['documentos']
     else:
-        return chainWithHistory(input, 123)
+        retorno['reposta'] = chainWithHistory(input, 123)
+    return retorno
 
     
 
@@ -68,7 +80,7 @@ def main():
 
     def display_prompt_menu():
         term_width = shutil.get_terminal_size((80, 20)).columns
-        num_columns = 5
+        num_columns = 3
         column_width = term_width // num_columns
         formatted_prompts = []
 
@@ -86,7 +98,7 @@ def main():
         
     def display_prompt_chain():
         term_width = shutil.get_terminal_size((80, 20)).columns
-        num_columns = 5
+        num_columns = 3
         column_width = term_width // num_columns
         formatted_prompts = []
 
@@ -148,36 +160,54 @@ def main():
             else:
                 print(Fore.MAGENTA + "Para deletar o documento é preciso passar o ID do documento")
         elif comando[0] == "/listDoc":
-            documentos = listDocumentos(None)
-            print()
+            if len(comando) == 2:
+                documentos = listDocumentos(comando[1])
+                print()
+                
+                for documento in documentos:
+                    print(Fore.MAGENTA + "Documento ID:", documento[0])
+                    print(Fore.MAGENTA + "Titulo:", documento[1])
+                    print(Fore.MAGENTA + "Descrição:", documento[2])
+                    print(Fore.MAGENTA + "MD5:", documento[3])
+                    print(Fore.MAGENTA + "URL:", documento[4])
+                    print(Fore.MAGENTA + "Chunks: ")
+                    for chunk in documento[5]:
+                        print(Fore.MAGENTA + "-----------")
+                        print(Fore.MAGENTA + "Chunk ID:", chunk[0])
+                        print(Fore.MAGENTA + "Chunk ID Vector:", chunk[1])
+                        print(Fore.MAGENTA + "Conteudo:", chunk[3])
+                print()
+            else:
+                documentos = listDocumentos(None)
+                print()
 
-            term_width = shutil.get_terminal_size((80, 20)).columns
-            num_columns = 6
-            column_width = term_width // num_columns
-            formatted_prompts = ["| documento_id".ljust(column_width)[:column_width], "| titulo".ljust(column_width)[:column_width], "| descricao".ljust(column_width)[:column_width], "| md5".ljust(column_width)[:column_width], "| url".ljust(column_width)[:column_width], "| chunks".ljust(column_width)[:column_width]]
+                term_width = shutil.get_terminal_size((80, 20)).columns
+                num_columns = 6
+                column_width = term_width // num_columns
+                formatted_prompts = ["| documento_id".ljust(column_width)[:column_width], "| titulo".ljust(column_width)[:column_width], "| descricao".ljust(column_width)[:column_width], "| md5".ljust(column_width)[:column_width], "| url".ljust(column_width)[:column_width], "| chunks".ljust(column_width)[:column_width]]
 
-            print(Fore.MAGENTA + "-" * term_width)
-            header = ""
-            for formatted_prompt in formatted_prompts:
-                header += formatted_prompt
+                print(Fore.MAGENTA + "-" * term_width)
+                header = ""
+                for formatted_prompt in formatted_prompts:
+                    header += formatted_prompt
 
-            print(Fore.MAGENTA + header.ljust(term_width)[:term_width])
-            print(Fore.MAGENTA + "-" * term_width)
-            
-            for documento in documentos:
-                line = ""
-                for doc in documento:
-                    if isinstance(doc, str):
-                        line += str("| "+doc).ljust(column_width)[:column_width]
-                    if isinstance(doc, NoneType):
-                        line += str("| ").ljust(column_width)[:column_width]
-                    elif isinstance(doc, int):
-                        line += str("| "+str(doc)).ljust(column_width)[:column_width]
-                    elif isinstance(doc, list):
-                        line += str("| Quantidade: "+str(len(doc))).ljust(column_width)[:column_width]
-                print(Fore.MAGENTA + line.ljust(term_width)[:term_width])
-            print()
-        elif comando[0] == "/clearHist":
+                print(Fore.MAGENTA + header.ljust(term_width)[:term_width])
+                print(Fore.MAGENTA + "-" * term_width)
+                
+                for documento in documentos:
+                    line = ""
+                    for doc in documento:
+                        if isinstance(doc, str):
+                            line += str("| "+doc).ljust(column_width)[:column_width]
+                        if isinstance(doc, NoneType):
+                            line += str("| ").ljust(column_width)[:column_width]
+                        elif isinstance(doc, int):
+                            line += str("| "+str(doc)).ljust(column_width)[:column_width]
+                        elif isinstance(doc, list):
+                            line += str("| Quantidade: "+str(len(doc))).ljust(column_width)[:column_width]
+                    print(Fore.MAGENTA + line.ljust(term_width)[:term_width])
+                print()
+        elif comando[0] == "/sessao":
             print(Fore.MAGENTA + menu)
         elif comando[0] == "/menu":
             display_prompt_menu()
@@ -214,10 +244,19 @@ def main():
             else:
                 if len(prompt) > 0:
                     response = callChain(prompt)
+                    
+                if len(response.get('documentos', None)) > 0:
+                    print(Fore.MAGENTA + "\nDocumentos utilizadoss: ")
+                    for element in response.get('documentos'):
+                        print("---------------")
+                        if element.metadata.get('titulo', None):
+                            print(f"Documento: {element.metadata['titulo']}")
+                        print(f'Conteúdo: {element.page_content}')
+                    print("\n")
                 
-                if len(response) > 0:
+                if len(response['reposta']) > 0:
                     print(Fore.GREEN + "\nCompliAI: ", end='')
-                    for element in response:
+                    for element in response['reposta']:
                         time.sleep(0.01)
                         print(element, end='', flush=True)
                     print("\n")

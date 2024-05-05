@@ -13,9 +13,9 @@ services:
       - "8080:80"
     develop:
       watch:
-        - action: sync
+        - action: sync+restart
           path: .
-          target: ./
+          target: ./code
   postgres :
     image: "postgres:latest"
     environment:
@@ -34,4 +34,9 @@ services:
   webchat:
     build: ./web/chat
     ports:
-      - "3000:3000"
+      - "80:3000"
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./web/chat
+          target: /usr/src/app

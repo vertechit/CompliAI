@@ -28,5 +28,6 @@ class Chunks(peewee.Model):
     id_vector = peewee.CharField()
     md5 = peewee.CharField()
     documento_id = peewee.ForeignKeyField(Documentos, backref='chunks')
+    conteudo = peewee.CharField(max_length=4000, null=True)
     class Meta:
         database = db
