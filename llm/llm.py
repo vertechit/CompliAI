@@ -6,12 +6,29 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from operator import itemgetter
 from controllers.ChatHistoryController import getChatMessasgeHistoryBySession, insertHistory
 from vectors.vectorStore import getRetriever
-from langchain_core.runnables import RunnablePassthrough
+from langchain_core.runnables import RunnablePassthrough, RunnableParallel
+import json
 
 model = ChatOpenAI(model="gpt-3.5-turbo")
 
 def chainPiada(input: str) -> str:
     prompt = ChatPromptTemplate.from_template("Me conte uma piada sobre {assunto}")
+    output_parser = StrOutputParser()
+    chain = (prompt | model | output_parser)
+    return chain.invoke({"assunto":input})
+
+def chainTitulo(input: str) -> str:
+    template =[
+        (
+            "system",
+            "Baseado na mensagem a seguir monte um titulo bem simplificado sobre a intenção da mensagem, mostre apenas o titulo"
+        ),
+        (
+            "human",
+            "{assunto}"
+        )
+        ]
+    prompt = ChatPromptTemplate.from_messages(template)
     output_parser = StrOutputParser()
     chain = (prompt | model | output_parser)
     return chain.invoke({"assunto":input})
@@ -104,4 +121,34 @@ def chainRetrieverWithHistory(input: str, sessionId: int)-> str:
         config={"configurable": {"session_id": sessionId}},
         )
     insertHistory(sessionId=sessionId, mensagem=ret, tipo=2)
+    return ret
+
+def chain_retriever_with_sources(input: str)-> dict:
+    template =[
+        (
+            "system",
+            """Responda a pergunta baseado somente no seguinte contexto
+            {context}
+            """
+        ),
+        (
+            "human",
+            "{question}"
+        )
+    ]
+
+    prompt = ChatPromptTemplate.from_messages(template)
+
+    chain = (
+        RunnablePassthrough.assign(context=itemgetter("documentos"), question=itemgetter("pergunta"))
+        | prompt
+        | model
+        | StrOutputParser()
+    )
+
+    abc = RunnableParallel(
+        {"documentos": getRetriever(), "pergunta": RunnablePassthrough()}
+    ).assign(resposta=chain)
+
+    ret = abc.invoke(input)
     return ret

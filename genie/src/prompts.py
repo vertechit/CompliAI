@@ -3,7 +3,7 @@ opcoes = [
     "/addDoc: Essa Chain irá fazer uma consulta simples para a LLM sem guardar histórico",
     "/delDoc: Este comando irá deletar um documento, é necessário passar o ID do documento",
     "/listDoc: Este comando irá listar os documentos carregados",
-    "/clearHist: Limpa o histórico de conversas"
+    "/sessao: Comando para realizar o controle das sessões"
     "/menu: Este comando irá mostrar as opções desejadas",
 ]
 
@@ -12,5 +12,7 @@ chains = [
     "Chain simples: Essa Chain irá fazer uma consulta simples para a LLM sem guardar histórico",
     "Chain Retriever: Essa Chain irá fazer uma consulta simples para a LLM sem guardar histórico",
     "Chain Retriever com Histórico: Essa Chain irá fazer uma consulta simples para a LLM sem guardar histórico",
+    "Chain com resumo: Essa chain irá resumir alguma coisa",
+    "Chain Retriever com Documentos: Essa chain irá retornar perguntas sobre os documentos e os documentos listados para formular a resposta",
     "Chain com Histórico: Essa Chain irá armazenar o histórico das conversas feitas no chat",
 ]

@@ -55,3 +55,8 @@ watch(() => props.messages.length, (newLength, oldLength) => {
   }
 });
 </script>
+Index, newMessage.message);
+    }
+  }
+});
+</script>

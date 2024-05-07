@@ -7,13 +7,15 @@ from langchain_community.document_loaders import WebBaseLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.documents.base import Document
 from typing import List
+import requests
+from bs4 import SoupStrainer
 
 
 def getMimetype(filepath: str)->str:
     return mimetypes.guess_type(filepath)
 
 def getDocuments(filepath: str)->List[Document]:
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=300,chunk_overlap=20)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=800,chunk_overlap=100)
     mimetypeP = getMimetype(filepath)
     mimetype = mimetypeP[0]
     document = List[Document]
@@ -28,7 +30,18 @@ def getDocuments(filepath: str)->List[Document]:
     elif(mimetype=='text/csv'):
         document = CSVLoader(file_path=filepath, csv_args={'delimiter': ';','quotechar': '"',}, source_column="Nome").load()
     elif(mimetype=="url"):
-        document = WebBaseLoader(filepath).load()
+        bskwarg = {}
+        if filepath.find('documentacao.compliancefiscal.com.br') > 0:
+            strainer1 = SoupStrainer(id='post')
+            bskwarg = {
+                'parse_only': strainer1
+            }
+        elif filepath.find('docs.compliancecapitalhumano.com.br') > 0:
+            strainer2 = SoupStrainer(attrs="post")
+            bskwarg = {
+                'parse_only': strainer2
+            }
+        document = WebBaseLoader(filepath, bs_kwargs=bskwarg).load()
         document = text_splitter.split_documents(document)
     elif(mimetype=="dir"):
         document = []
