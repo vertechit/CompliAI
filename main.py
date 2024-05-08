@@ -1,18 +1,20 @@
-from fastapi import Body, FastAPI, UploadFile
+from fastapi import Body, FastAPI, UploadFile, HTTPException
 from pydantic import BaseModel, Field
 from genie.genie import main
 from llm.llm import chain, chainWithHistory, chainPiada, chainRetriever, chainRetrieverWithHistory
 from controllers.DocumentsController import saveDocument, deleteDocumento, listDocumentos
+from controllers.UserController import create_user, login
 from typing import List
 import tempfile
 import os
 
-from models import ChatHistory, Documentos
+from models import ChatHistory, Documentos, User
 from vectors import vectorStore
 
 tags_metadata = [
     {"name": "LLMs", "description": "Chamadas para as LLMs"},
     {"name": "Documentos", "description": "Cadastros de documentos"},
+    {"name": "Usuários", "description": "Cadastros de usuários"},
 ]
 app = FastAPI(openapi_tags=tags_metadata)
 
@@ -38,16 +40,21 @@ class DocumentoObj(BaseModel):
     chunks: List[ChunkObj]
 
 def destroyDatabases():
-    vectorStore.dropCollection()
-    if ChatHistory.ChatHistory.table_exists():
-        ChatHistory.ChatHistory.drop_table()
-    if Documentos.Documentos.table_exists():
-        Documentos.Documentos.drop_table()
-    if Documentos.Chunks.table_exists():
-        Documentos.Chunks.drop_table()
+    if os.getenv("RECREATE_DB", 0) == 1:
+        vectorStore.dropCollection()
+        if ChatHistory.ChatHistory.table_exists():
+            ChatHistory.ChatHistory.drop_table()
+        if Documentos.Documentos.table_exists():
+            Documentos.Documentos.drop_table()
+        if Documentos.Chunks.table_exists():
+            Documentos.Chunks.drop_table()
+        if User.User.table_exists():
+            User.User.drop_table()
 
 def initDatabases():
     vectorStore.createCollection()
+    if not User.User.table_exists():
+        User.User.create_table()
     if not ChatHistory.ChatHistory.table_exists():
         ChatHistory.ChatHistory.create_table()
     if not Documentos.Documentos.table_exists():
@@ -55,8 +62,8 @@ def initDatabases():
     if not Documentos.Chunks.table_exists():
         Documentos.Chunks.create_table()
 
-if os.getenv("RECREATE_DB", 0) == 1:
-    destroyDatabases()
+
+destroyDatabases()
 initDatabases()
 
 @app.post("/piada", tags=["LLMs"])
@@ -110,18 +117,37 @@ def listaDocumento(documento_id: int = None)-> DocumentoObj | None:
     return ret
 
 @app.post("/createDocument/", tags=["Documentos"])
-async def uploadFile(file: UploadFile | None, filename: str, description: str):
+async def uploadFile(filename: str | None, description: str, file: UploadFile):
     contents = await file.read()
     arquivoTemp = tempfile.gettempdir()+"/"+file.filename
     with open(arquivoTemp, "wb") as f:
         f.write(contents)
-    documento = saveDocument(arquivoTemp, filename, description)
+    documento = saveDocument(arquivoTemp, filename | file.filename, description)
+    return {"retorno": documento}
+
+@app.post("/createDocumentUrl/", tags=["Documentos"])
+async def uploadFileUrl(titulo: str, description: str, url: str):
+    documento = saveDocument(url, titulo, description)
     return {"retorno": documento}
 
 @app.delete("/deleteDocument/{documento_id}", tags=["Documentos"])
 def deletaDocumento(documento_id: int):
     deleteDocumento(documento_id)
     return {"retorno": "Deletado"}
+
+@app.post("/createUsers", tags=["Usuários"])
+def createUserAPI(usuario: str, password:str):
+    usu:int = 0
+    try:
+        usu = create_user(usuario, password)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return {"usuario_id": usu}
+
+@app.post("/login", tags=["Usuários"])
+def loginAPI(usuario: str, password:str):
+    usu = login(usuario, password)
+    return {"usuario_id": usu}
 
 if __name__ == "__main__":
     main()
