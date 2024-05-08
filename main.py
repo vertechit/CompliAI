@@ -27,12 +27,14 @@ class ChunkObj(BaseModel):
     chunks_id: int
     id_vector: str
     md5: str
+    conteudo: str
         
 class DocumentoObj(BaseModel):
     documento_id: int
     titulo: str
     descricao: str
     md5: str
+    url: str | None
     chunks: List[ChunkObj]
 
 def destroyDatabases():
@@ -92,8 +94,8 @@ def listaDocumento()-> List[DocumentoObj] | None:
     if len(documentos) == 0:
         return None
     for doc in documentos:
-        chunk = [ChunkObj(chunks_id=chunkLoop[0], id_vector=chunkLoop[1], md5=chunkLoop[2]) for chunkLoop in doc[4]]
-        ret.append(DocumentoObj(documento_id=doc[0], titulo=doc[1], descricao=doc[2], md5=doc[3], chunks=chunk))
+        chunk = [ChunkObj(chunks_id=chunkLoop[0], id_vector=chunkLoop[1], md5=chunkLoop[2], conteudo=chunkLoop[3]) for chunkLoop in doc[5]]
+        ret.append(DocumentoObj(documento_id=doc[0], titulo=doc[1], descricao=doc[2], md5=doc[3], url=doc[4], chunks=chunk))
     return ret
 
 @app.get("/listDocument/{documento_id}", tags=["Documentos"])
@@ -111,7 +113,6 @@ def listaDocumento(documento_id: int = None)-> DocumentoObj | None:
 async def uploadFile(file: UploadFile | None, filename: str, description: str):
     contents = await file.read()
     arquivoTemp = tempfile.gettempdir()+"/"+file.filename
-    print(tempfile.gettempdir())
     with open(arquivoTemp, "wb") as f:
         f.write(contents)
     documento = saveDocument(arquivoTemp, filename, description)
