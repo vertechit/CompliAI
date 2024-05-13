@@ -1,44 +1,4 @@
+
 <template>
-    <div class="typing">
-        <span class="dot dot1">.</span>
-        <span class="dot dot2">.</span>
-        <span class="dot dot3">.</span>
-    </div>
-</template>
-
-<script setup lang="ts">
-
-</script>
-
-<style scoped>
-    .typing {
-        display: inline-block;
-        font-size: 24px;
-        font-weight: bold;
-    }
-
-    @keyframes blink {
-        0%, 20%, 100% {
-            opacity: 1; 
-        }
-        50% {
-            opacity: 0; 
-        }
-    }
-
-    .dot {
-        animation: blink 0.8s infinite; 
-    }
-
-    .dot1 {
-        animation-delay: 0s;
-    }
-
-    .dot2 {
-        animation-delay: 0.3s;
-    }
-
-    .dot3 {
-        animation-delay: 0.6s;
-    }
-</style>
+    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><circle cx="4" cy="12" r="3" fill="#888888"><animate id="svgSpinners3DotsBounce0" attributeName="cy" begin="0;svgSpinners3DotsBounce1.end+0.25s" calcMode="spline" dur="0.6s" keySplines=".33,.66,.66,1;.33,0,.66,.33" values="12;6;12"></animate></circle><circle cx="12" cy="12" r="3" fill="#888888"><animate attributeName="cy" begin="svgSpinners3DotsBounce0.begin+0.1s" calcMode="spline" dur="0.6s" keySplines=".33,.66,.66,1;.33,0,.66,.33" values="12;6;12"></animate></circle><circle cx="20" cy="12" r="3" fill="#888888"><animate id="svgSpinners3DotsBounce1" attributeName="cy" begin="svgSpinners3DotsBounce0.begin+0.2s" calcMode="spline" dur="0.6s" keySplines=".33,.66,.66,1;.33,0,.66,.33" values="12;6;12"></animate></circle></svg>
+  </template>

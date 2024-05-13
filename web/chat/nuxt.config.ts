@@ -4,7 +4,8 @@ export default defineNuxtConfig({
   modules:[
     '@nuxtjs/tailwindcss',
     'nuxt-headlessui',
-    '@pinia/nuxt'
+    '@pinia/nuxt',
+    'nuxt-icon',
   ],
   headlessui: {
     prefix: 'Headless'
