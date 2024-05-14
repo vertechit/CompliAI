@@ -5,6 +5,7 @@ from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from operator import itemgetter
 from controllers.ChatHistoryController import getChatMessasgeHistoryBySession, insertHistory
+from controllers.ChatSessionController import saveSessao
 from vectors.vectorStore import getRetriever
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 import json
@@ -151,4 +152,43 @@ def chain_retriever_with_sources(input: str)-> dict:
     ).assign(resposta=chain)
 
     ret = abc.invoke(input)
+    return ret
+
+#CompliAi - Issue 7
+def chainRetrieverWithHistoryTitle(input: str, sessionId: int)-> str:
+    saveSessao(pergunta=input, session_id=sessionId)
+    insertHistory(sessionId=sessionId, mensagem=input, tipo=1)
+    template =[
+        (
+            "system",
+            """Responda a pergunta baseado somente no seguinte contexto
+            {context}
+            """
+        ),
+        MessagesPlaceholder(variable_name="history"),
+        (
+            "human",
+            "{question}"
+        )
+    ]
+    prompt = ChatPromptTemplate.from_messages(template)
+    contextChain = itemgetter("question") | getRetriever() 
+    first_step = RunnablePassthrough.assign(context=contextChain)
+    chain = (
+        first_step
+        | prompt
+        | model
+        | StrOutputParser()
+    )
+    with_message_history = RunnableWithMessageHistory(
+        chain,
+        getChatMessasgeHistoryBySession,
+        input_messages_key="question",
+        history_messages_key="history",
+    )
+    ret = with_message_history.invoke(
+        {"context": getRetriever(), "question":input},
+        config={"configurable": {"session_id": sessionId}},
+        )
+    insertHistory(sessionId=sessionId, mensagem=ret, tipo=2)
     return ret

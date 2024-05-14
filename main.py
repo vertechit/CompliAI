@@ -1,14 +1,15 @@
 from fastapi import Body, FastAPI, UploadFile, HTTPException
 from pydantic import BaseModel, Field
 from genie.genie import main
-from llm.llm import chain, chainWithHistory, chainPiada, chainRetriever, chainRetrieverWithHistory
+from llm.llm import chain, chainWithHistory, chainPiada, chainRetriever, chainRetrieverWithHistory, chainRetrieverWithHistoryTitle
 from controllers.DocumentsController import saveDocument, deleteDocumento, listDocumentos
+from controllers.ChatSessionController import deleteSessao
 from controllers.UserController import create_user, login
 from typing import List
 import tempfile
 import os
 
-from models import ChatHistory, Documentos, User
+from models import ChatHistory, Documentos, ChatSession, User
 from vectors import vectorStore
 
 tags_metadata = [
@@ -38,6 +39,12 @@ class DocumentoObj(BaseModel):
     md5: str
     url: str | None
     chunks: List[ChunkObj]
+
+#CompliAi - Issue 7
+class SessaoObj(BaseModel):
+    session_id: int
+    titulo: str
+    criado: str
 
 def destroyDatabases():
     if os.getenv("RECREATE_DB", 0) == 1:
@@ -94,6 +101,13 @@ def retornaMensagem(sessionId: int, chat: InputChat)-> ResponseChat:
     response = ResponseChat(AiMessage=ret)
     return response
 
+#CompliAi - Issue 7
+@app.post("/chainRetrieverHistoryTitle/{sessionId}", tags=["LLMs"])
+def retornaMensagem(sessionId: int, chat: InputChat)-> ResponseChat:
+    ret = chainRetrieverWithHistoryTitle(chat.HumamMessage, sessionId)
+    response = ResponseChat(AiMessage=ret)
+    return response
+
 @app.get("/listDocument", tags=["Documentos"])
 def listaDocumento()-> List[DocumentoObj] | None:
     ret: List[DocumentoObj] = []
@@ -116,6 +130,17 @@ def listaDocumento(documento_id: int = None)-> DocumentoObj | None:
         ret = DocumentoObj(documento_id=doc[0], titulo=doc[1], descricao=doc[2], md5=doc[3], chunks=chunk)
     return ret
 
+#CompliAi - Issue 7
+@app.get("/listSession/{session_id}", tags=["ChatSession"])
+def listaSessao(session_id: int = None)-> SessaoObj | None:
+    ret: SessaoObj = None
+    sessoes = listaSessao(session_id)
+    if len(sessoes) == 0:
+        return None
+    for sessao in sessoes:
+        ret = SessaoObj(session_id=sessao[0], titulo=sessao[1], criado=sessao[2])
+    return ret
+
 @app.post("/createDocument/", tags=["Documentos"])
 async def uploadFile(filename: str | None, description: str, file: UploadFile):
     contents = await file.read()
@@ -134,6 +159,12 @@ async def uploadFileUrl(titulo: str, description: str, url: str):
 def deletaDocumento(documento_id: int):
     deleteDocumento(documento_id)
     return {"retorno": "Deletado"}
+
+
+@app.delete("/deleteSession/{session_id}", tags=["ChatSession"])
+def deletaSessao(session_id: int):
+    deleteSessao(session_id)
+    return {"retorno": "Sessão Deletada"}
 
 @app.post("/createUsers", tags=["Usuários"])
 def createUserAPI(usuario: str, password:str):
