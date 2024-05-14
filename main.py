@@ -1,19 +1,21 @@
-from fastapi import Body, FastAPI, UploadFile
+from fastapi import Body, FastAPI, UploadFile, HTTPException
 from pydantic import BaseModel, Field
 from genie.genie import main
 from llm.llm import chain, chainWithHistory, chainPiada, chainRetriever, chainRetrieverWithHistory, chainRetrieverWithHistoryTitle
 from controllers.DocumentsController import saveDocument, deleteDocumento, listDocumentos
 from controllers.ChatSessionController import deleteSessao
+from controllers.UserController import create_user, login
 from typing import List
 import tempfile
 import os
 
-from models import ChatHistory, Documentos, ChatSession
+from models import ChatHistory, Documentos, ChatSession, User
 from vectors import vectorStore
 
 tags_metadata = [
     {"name": "LLMs", "description": "Chamadas para as LLMs"},
     {"name": "Documentos", "description": "Cadastros de documentos"},
+    {"name": "Usuários", "description": "Cadastros de usuários"},
 ]
 app = FastAPI(openapi_tags=tags_metadata)
 
@@ -28,12 +30,14 @@ class ChunkObj(BaseModel):
     chunks_id: int
     id_vector: str
     md5: str
+    conteudo: str
         
 class DocumentoObj(BaseModel):
     documento_id: int
     titulo: str
     descricao: str
     md5: str
+    url: str | None
     chunks: List[ChunkObj]
 
 #CompliAi - Issue 7
@@ -43,18 +47,21 @@ class SessaoObj(BaseModel):
     criado: str
 
 def destroyDatabases():
-    vectorStore.dropCollection()
-    if ChatHistory.ChatHistory.table_exists():
-        ChatHistory.ChatHistory.drop_table()
-    if Documentos.Documentos.table_exists():
-        Documentos.Documentos.drop_table()
-    if Documentos.Chunks.table_exists():
-        Documentos.Chunks.drop_table()
-    if ChatSession.ChatSession.table_exists():
-        ChatSession.ChatSession.drop_table()
+    if os.getenv("RECREATE_DB", 0) == 1:
+        vectorStore.dropCollection()
+        if ChatHistory.ChatHistory.table_exists():
+            ChatHistory.ChatHistory.drop_table()
+        if Documentos.Documentos.table_exists():
+            Documentos.Documentos.drop_table()
+        if Documentos.Chunks.table_exists():
+            Documentos.Chunks.drop_table()
+        if User.User.table_exists():
+            User.User.drop_table()
 
 def initDatabases():
     vectorStore.createCollection()
+    if not User.User.table_exists():
+        User.User.create_table()
     if not ChatHistory.ChatHistory.table_exists():
         ChatHistory.ChatHistory.create_table()
     if not Documentos.Documentos.table_exists():
@@ -62,8 +69,8 @@ def initDatabases():
     if not Documentos.Chunks.table_exists():
         Documentos.Chunks.create_table()
 
-if os.getenv("RECREATE_DB", 0) == 1:
-    destroyDatabases()
+
+destroyDatabases()
 initDatabases()
 
 @app.post("/piada", tags=["LLMs"])
@@ -108,8 +115,8 @@ def listaDocumento()-> List[DocumentoObj] | None:
     if len(documentos) == 0:
         return None
     for doc in documentos:
-        chunk = [ChunkObj(chunks_id=chunkLoop[0], id_vector=chunkLoop[1], md5=chunkLoop[2]) for chunkLoop in doc[4]]
-        ret.append(DocumentoObj(documento_id=doc[0], titulo=doc[1], descricao=doc[2], md5=doc[3], chunks=chunk))
+        chunk = [ChunkObj(chunks_id=chunkLoop[0], id_vector=chunkLoop[1], md5=chunkLoop[2], conteudo=chunkLoop[3]) for chunkLoop in doc[5]]
+        ret.append(DocumentoObj(documento_id=doc[0], titulo=doc[1], descricao=doc[2], md5=doc[3], url=doc[4], chunks=chunk))
     return ret
 
 @app.get("/listDocument/{documento_id}", tags=["Documentos"])
@@ -135,13 +142,17 @@ def listaSessao(session_id: int = None)-> SessaoObj | None:
     return ret
 
 @app.post("/createDocument/", tags=["Documentos"])
-async def uploadFile(file: UploadFile | None, filename: str, description: str):
+async def uploadFile(filename: str | None, description: str, file: UploadFile):
     contents = await file.read()
     arquivoTemp = tempfile.gettempdir()+"/"+file.filename
-    print(tempfile.gettempdir())
     with open(arquivoTemp, "wb") as f:
         f.write(contents)
-    documento = saveDocument(arquivoTemp, filename, description)
+    documento = saveDocument(arquivoTemp, filename | file.filename, description)
+    return {"retorno": documento}
+
+@app.post("/createDocumentUrl/", tags=["Documentos"])
+async def uploadFileUrl(titulo: str, description: str, url: str):
+    documento = saveDocument(url, titulo, description)
     return {"retorno": documento}
 
 @app.delete("/deleteDocument/{documento_id}", tags=["Documentos"])
@@ -149,11 +160,25 @@ def deletaDocumento(documento_id: int):
     deleteDocumento(documento_id)
     return {"retorno": "Deletado"}
 
-#CompliAi - Issue 7
+
 @app.delete("/deleteSession/{session_id}", tags=["ChatSession"])
 def deletaSessao(session_id: int):
     deleteSessao(session_id)
     return {"retorno": "Sessão Deletada"}
+
+@app.post("/createUsers", tags=["Usuários"])
+def createUserAPI(usuario: str, password:str):
+    usu:int = 0
+    try:
+        usu = create_user(usuario, password)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return {"usuario_id": usu}
+
+@app.post("/login", tags=["Usuários"])
+def loginAPI(usuario: str, password:str):
+    usu = login(usuario, password)
+    return {"usuario_id": usu}
 
 if __name__ == "__main__":
     main()
