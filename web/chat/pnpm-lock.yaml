@@ -45,6 +45,9 @@ importers:
       '@tailwindcss/forms':
         specifier: ^0.5.7
         version: 0.5.7(tailwindcss@3.4.3)
+      '@types/formidable':
+        specifier: ^3.4.5
+        version: 3.4.5
       '@types/uuid':
         specifier: ^9.0.8
         version: 9.0.8
@@ -987,6 +990,9 @@ packages:
 
   '@types/estree@1.0.5':
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
+
+  '@types/formidable@3.4.5':
+    resolution: {integrity: sha512-s7YPsNVfnsng5L8sKnG/Gbb2tiwwJTY1conOkJzTMRvJAlLFW1nEua+ADsJQu8N1c0oTHx9+d5nqg10WuT9gHQ==}
 
   '@types/http-proxy@1.17.14':
     resolution: {integrity: sha512-SSrD0c1OQzlFX7pGu1eXxSEjemej64aaNPRhhVYUGqXh0BtldAAx37MG8btcumvpgKyZp1F5Gn3JkktdxiFv6w==}
@@ -5132,6 +5138,10 @@ snapshots:
       minimatch: 9.0.4
 
   '@types/estree@1.0.5': {}
+
+  '@types/formidable@3.4.5':
+    dependencies:
+      '@types/node': 20.12.11
 
   '@types/http-proxy@1.17.14':
     dependencies:

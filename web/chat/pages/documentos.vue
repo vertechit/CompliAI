@@ -3,7 +3,7 @@
         <CardsDocuments></CardsDocuments>
         <SlideOversWithFooter  v-if="modaImportarArquivo" title="Importar Arquivo" @close="changeModaImportarArquivo(false)" >
             <template #content>
-                <FormFormsImportarArquivo :clear-form="clearForm" :submit-form="submitForm" />
+                <FormFormsImportarArquivo :clear-form="clearForm" :submit-form="submitForm" @close="changeModaImportarArquivo(false)" />
             </template>
             <template #footer>
                 <div class="space-x-2">
@@ -30,11 +30,8 @@ import buttonsDefault from '@/components/buttons/default.vue'
 import SlideOversWithFooter from '@/components/slideOvers/withFooter.vue'
 const modaImportarArquivo = ref(false)
 const changeModaImportarArquivo = (value: boolean) => modaImportarArquivo.value = value
-
 const submitForm = ref(false)
 const clearForm = ref(false)
-
-
 </script>
 <style scoped>
 .floating-button {
