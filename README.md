@@ -72,7 +72,7 @@ http://localhost:3000
 ```
 
 ### Links
-QDRant Dashboard: http://localhost:6333/dashboard
-Adminer: http://localhost:8081/
-API: http://localhost:8080/docs
-WebApp: http://localhost/
+QDRant Dashboard: http://localhost:6333/dashboard  
+Adminer: http://localhost:8081/  
+API: http://localhost:8080/docs  
+WebApp: http://localhost/  

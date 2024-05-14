@@ -1,5 +1,6 @@
 import peewee
 import os
+from .User import User
 
 db = peewee.SqliteDatabase('example.db')
 
@@ -14,9 +15,10 @@ class Documentos(peewee.Model):
     documento_id = peewee.AutoField(primary_key=True)
     titulo = peewee.CharField()
     descricao = peewee.CharField()
-    md5 = peewee.CharField()
+    md5 = peewee.CharField(unique=True)
     arquivo = peewee.BlobField(null=True)
     url = peewee.CharField(null=True)
+    owner = peewee.ForeignKeyField(User, null=True)
     class Meta:
         database = db
         

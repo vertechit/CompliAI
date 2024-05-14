@@ -9,6 +9,7 @@ services:
       POSTGRES_PORT: ${POSTGRES_PORT}
       POSTGRES_DATASE: ${POSTGRES_DATASE}
       QDRANT_URL: ${QDRANT_URL}
+      RECREATE_DB : ${RECREATE_DB}
     ports:
       - "8080:80"
     develop:
