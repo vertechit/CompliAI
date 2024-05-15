@@ -12,6 +12,43 @@ import json
 
 model = ChatOpenAI(model="gpt-3.5-turbo")
 
+PROMPT_RESP_BASEADO_CONTEXTO = "Responda a pergunta baseado somente no seguinte contexto\n{context}"
+
+template_history_question_and_context =[
+    (
+        "system",
+        PROMPT_RESP_BASEADO_CONTEXTO
+    ),
+    MessagesPlaceholder(variable_name="history"),
+    (
+        "human",
+        "{question}"
+    )
+]
+
+template_context =[
+    (
+        "system",
+        PROMPT_RESP_BASEADO_CONTEXTO
+    ),
+    (
+        "human",
+        "{question}"
+    )
+]
+
+template_history_question =[
+    (
+        "system",
+        "Responda a pergunta de forma resumida"
+    ),
+    MessagesPlaceholder(variable_name="history"),
+    (
+        "human",
+        "{question}"
+    )
+]
+
 def chain_piada(input: str) -> str:
     prompt = ChatPromptTemplate.from_template("Me conte uma piada sobre {assunto}")
     output_parser = StrOutputParser()
@@ -28,7 +65,7 @@ def chain_titulo(input: str) -> str:
             "human",
             "{assunto}"
         )
-        ]
+    ]
     prompt = ChatPromptTemplate.from_messages(template)
     output_parser = StrOutputParser()
     chain = (prompt | model | output_parser)
@@ -43,18 +80,7 @@ def chain(input: str) -> str:
 
 def chain_with_history(input: str, sessionId: int) -> str:
     insertHistory(sessionId=sessionId, mensagem=input, tipo=1)
-    template =[
-        (
-            "system",
-            "Responda a pergunta de forma resumida"
-        ),
-        MessagesPlaceholder(variable_name="history"),
-        (
-            "human",
-            "{question}"
-        )
-        ]
-    prompt = ChatPromptTemplate.from_messages(template)
+    prompt = ChatPromptTemplate.from_messages(template_history_question)
     chain = ( 
             prompt
             | model
@@ -72,11 +98,7 @@ def chain_with_history(input: str, sessionId: int) -> str:
     return ret
 
 def chain_retriever(input: str)->str:
-    template = """Responda a pergunta baseado somente no seguinte contexto:
-{context}
-
-Pergunta: {question}
-"""
+    template = PROMPT_RESP_BASEADO_CONTEXTO+"\n\nPergunta: {question}"
     prompt = ChatPromptTemplate.from_template(template)
     chain = (
         {"context": getRetriever(), "question": RunnablePassthrough()}
@@ -89,20 +111,7 @@ Pergunta: {question}
 
 def chain_retriever_with_history(input: str, sessionId: int)-> str:
     insertHistory(sessionId=sessionId, mensagem=input, tipo=1)
-    template =[
-        (
-            "system",
-            """Responda a pergunta baseado somente no seguinte contexto
-            {context}
-            """
-        ),
-        MessagesPlaceholder(variable_name="history"),
-        (
-            "human",
-            "{question}"
-        )
-    ]
-    prompt = ChatPromptTemplate.from_messages(template)
+    prompt = ChatPromptTemplate.from_messages(template_history_question_and_context)
     contextChain = itemgetter("question") | getRetriever() 
     first_step = RunnablePassthrough.assign(context=contextChain)
     chain = (
@@ -125,20 +134,7 @@ def chain_retriever_with_history(input: str, sessionId: int)-> str:
     return ret
 
 def chain_retriever_with_sources(input: str)-> dict:
-    template =[
-        (
-            "system",
-            """Responda a pergunta baseado somente no seguinte contexto
-            {context}
-            """
-        ),
-        (
-            "human",
-            "{question}"
-        )
-    ]
-
-    prompt = ChatPromptTemplate.from_messages(template)
+    prompt = ChatPromptTemplate.from_messages(template_context)
 
     chain = (
         RunnablePassthrough.assign(context=itemgetter("documentos"), question=itemgetter("pergunta"))
@@ -154,24 +150,10 @@ def chain_retriever_with_sources(input: str)-> dict:
     ret = abc.invoke(input)
     return ret
 
-#CompliAi - Issue 7
 def chain_retriever_with_history_title(input: str, sessionId: int)-> str:
     saveSessao(pergunta=input, session_id=sessionId)
     insertHistory(sessionId=sessionId, mensagem=input, tipo=1)
-    template =[
-        (
-            "system",
-            """Responda a pergunta baseado somente no seguinte contexto
-            {context}
-            """
-        ),
-        MessagesPlaceholder(variable_name="history"),
-        (
-            "human",
-            "{question}"
-        )
-    ]
-    prompt = ChatPromptTemplate.from_messages(template)
+    prompt = ChatPromptTemplate.from_messages(template_history_question_and_context)
     contextChain = itemgetter("question") | getRetriever() 
     first_step = RunnablePassthrough.assign(context=contextChain)
     chain = (
