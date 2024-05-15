@@ -111,8 +111,8 @@ def chain_retriever(input: str)->str:
 def chain_retriever_with_history(input: str, sessionId: int)-> str:
     insertHistory(sessionId=sessionId, mensagem=input, tipo=1)
     prompt = ChatPromptTemplate.from_messages(__template_history_question_and_context)
-    contextChain = itemgetter("question") | getRetriever() 
-    first_step = RunnablePassthrough.assign(context=contextChain)
+    context_chain = itemgetter("question") | getRetriever() 
+    first_step = RunnablePassthrough.assign(context=context_chain)
     chain = (
         first_step
         | prompt
@@ -151,25 +151,4 @@ def chain_retriever_with_sources(input: str)-> dict:
 
 def chain_retriever_with_history_title(input: str, sessionId: int)-> str:
     saveSessao(pergunta=input, session_id=sessionId)
-    insertHistory(sessionId=sessionId, mensagem=input, tipo=1)
-    prompt = ChatPromptTemplate.from_messages(__template_history_question_and_context)
-    contextChain = itemgetter("question") | getRetriever() 
-    first_step = RunnablePassthrough.assign(context=contextChain)
-    chain = (
-        first_step
-        | prompt
-        | model
-        | _output_parser
-    )
-    with_message_history = RunnableWithMessageHistory(
-        chain,
-        getChatMessasgeHistoryBySession,
-        input_messages_key="question",
-        history_messages_key="history",
-    )
-    ret = with_message_history.invoke(
-        {"context": getRetriever(), "question":input},
-        config={"configurable": {"session_id": sessionId}},
-        )
-    insertHistory(sessionId=sessionId, mensagem=ret, tipo=2)
-    return ret
+    return chain_retriever_with_history(input, sessionId)

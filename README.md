@@ -55,10 +55,10 @@ curl -X POST http://127.0.0.1:8080/chain --data '{"HumamMessage": "Quem é o pre
 
 # Anexar documento
 curl -X 'POST' \
-  'http://127.0.0.1:8080/createDocument/?filename=Document%201&description=Descricao%20de%20documento%201' \
+  'http://127.0.0.1:8000/createDocument/?filename=Document%201&description=Descricao%20de%20documento%201' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
-  -F 'file=@/mnt/c/dev/Repositorios/CompliAI/arquivos/salarios.csv'
+  -F 'file=@/mnt/c/dev/Repositorios/CompliAI/app/arquivos/salarios.csv'
 ```
 
 ### Subir o Genie no Docker
