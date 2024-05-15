@@ -15,8 +15,7 @@ def saveDocument(filepath: str | bytes, filename: str, descr: str)-> str:
         urlParam = filepath
         md5file = hashlib.sha512(filepath.encode("utf-8")).hexdigest()
     elif isinstance(filepath, str):
-        if os.path.isabs(filepath):
-            raise
+        filepath = os.path.join(os.path.dirname(__file__),'../arquivos',filepath)
         file = open(filepath, 'rb')
         fileBytes = file.read()
         md5file = hashlib.sha512(fileBytes).hexdigest()
