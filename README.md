@@ -63,7 +63,7 @@ curl -X 'POST' \
 
 ### Subir o Genie no Docker
 ```
-docker exec -it compliai-api-1 python3 ./app/main.py
+docker exec -it compliai-api-1 python3 main.py
 ```
 
 ### Links

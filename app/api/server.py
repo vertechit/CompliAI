@@ -89,7 +89,7 @@ async def uploadFile(filename: str | None, description: str, file: UploadFile):
     arquivoTemp = tempfile.gettempdir()+"/"+file.filename
     with open(arquivoTemp, "wb") as f:
         f.write(contents)
-    documento = saveDocument(arquivoTemp, filename | file.filename, description)
+    documento = saveDocument(arquivoTemp, filename, description)
     return {"retorno": documento}
 
 @app.post("/createDocumentUrl/", tags=["Documentos"])
