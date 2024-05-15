@@ -50,8 +50,6 @@ def getDocuments(filepath: str)->List[Document]:
     if(mimetype==None):
         if(validators.url(filepath)):
             mimetype="url"
-        elif(os.path.isdir(filepath)):
-            mimetype = "dir"
     if(mimetype=='application/pdf'):
         document = PyPDFLoader(filepath).load_and_split()
         document = text_splitter.split_documents(document)
@@ -71,11 +69,5 @@ def getDocuments(filepath: str)->List[Document]:
             }
         document = WebBaseLoader(filepath, bs_kwargs=bskwarg).load()
         document = text_splitter.split_documents(document)
-    elif(mimetype=="dir"):
-        document = []
-        for arquivo in os.listdir(filepath):
-            if arquivo != None:
-                for doc in getDocuments(filepath+arquivo):
-                    document.append(Document(page_content=doc.page_content,metadata=doc.metadata))
     
     return(document)

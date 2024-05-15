@@ -1,6 +1,11 @@
 FROM node:latest
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+
+ENV APP_HOME=/usr/src/app
+ENV APP_USER=appuser
+
+RUN adduser --home $APP_HOME $APP_USER
+USER $APP_USER
+WORKDIR $APP_HOME
 
 COPY chat/package*.json ./
 COPY chat /usr/src/app
