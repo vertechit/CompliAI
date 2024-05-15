@@ -31,8 +31,8 @@ jobs:
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
         if: github.ref == 'refs/heads/main'
         with:
-          context: ./web/chat
-          file: ../../deploy/web.dockerfile
+          context: ./web
+          file: ../deploy/web.dockerfile
           push: true
           tags: |
             "devcst/compliaiweb"
