@@ -4,6 +4,7 @@ from utils.utils import getDocuments, getMimetype, get_extension
 from typing import List
 import tempfile
 import hashlib
+import os
 
 def saveDocument(filepath: str | bytes, filename: str, descr: str)-> str:
     file = None
@@ -14,13 +15,15 @@ def saveDocument(filepath: str | bytes, filename: str, descr: str)-> str:
         urlParam = filepath
         md5file = hashlib.sha512(filepath.encode("utf-8")).hexdigest()
     elif isinstance(filepath, str):
+        if os.path.isabs(filepath):
+            raise
         file = open(filepath, 'rb')
         fileBytes = file.read()
         md5file = hashlib.sha512(fileBytes).hexdigest()
     elif isinstance(filepath, bytes):
         fileBytes = filepath
         md5file = hashlib.sha512(fileBytes).hexdigest()
-        filepath = tempfile.gettempdir()+f"/tempfile{get_extension(getMimetype(filename)[0])}"
+        filepath = os.path.join(tempfile.gettempdir(), f"/tempfile{get_extension(getMimetype(filename)[0])}")
         with open(filepath, "wb") as f:
             f.write(fileBytes)
     docExists = Documentos.select().where(Documentos.md5==md5file).first()
