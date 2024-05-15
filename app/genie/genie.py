@@ -13,7 +13,7 @@ from colorama import Fore, Back, Style
 import time
 from genie.src.extras import lamp
 from genie.src.prompts import opcoes, chains
-from llm.llm import chain, chainTitulo, chain_retriever_with_sources, chainPiada, chainWithHistory, chainRetriever, chainRetrieverWithHistory
+from llm.llm import chain, chain_with_history, chain_piada, chain_retriever, chain_retriever_with_history, chain_retriever_with_history_title
 from controllers.DocumentsController import saveDocument, deleteDocumento, listDocumentos
 
 """

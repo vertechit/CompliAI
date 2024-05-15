@@ -1,5 +1,5 @@
 from fastapi import Body, FastAPI, UploadFile, HTTPException
-from llm.llm import chain, chainWithHistory, chainPiada, chainRetriever, chainRetrieverWithHistory, chainRetrieverWithHistoryTitle
+from llm.llm import chain, chain_with_history, chain_piada, chain_retriever, chain_retriever_with_history, chain_retriever_with_history_title
 from controllers.DocumentsController import saveDocument, deleteDocumento, listDocumentos
 from controllers.ChatSessionController import deleteSessao, listSessao
 from controllers.ChatHistoryController import getChatMessasgeHistoryBySession
@@ -28,7 +28,7 @@ async def read_main():
 # APIS de LLMS
 @app.post("/piada", tags=["LLMs"])
 def retornaMensagem(mensagem=Body()):
-    return {"retorno": chainPiada(mensagem)}
+    return {"retorno": chain_piada(mensagem)}
 
 @app.post("/chain", tags=["LLMs"])
 def retornaMensagem(chat: InputChat)-> ResponseChat:
@@ -38,25 +38,25 @@ def retornaMensagem(chat: InputChat)-> ResponseChat:
 
 @app.post("/chainHistory/{sessionId}", tags=["LLMs"])
 def retornaMensagem(sessionId: int, chat: InputChat)-> ResponseChat:
-    ret = chainWithHistory(chat.HumamMessage, sessionId)
+    ret = chain_with_history(chat.HumamMessage, sessionId)
     response = ResponseChat(AiMessage=ret)
     return response
 
-@app.post("/chainRetriever", tags=["LLMs"])
+@app.post("/chain_retriever", tags=["LLMs"])
 def retornaMensagem(sessionId: int, chat: InputChat)-> ResponseChat:
-    ret = chainRetriever(chat.HumamMessage)
+    ret = chain_retriever(chat.HumamMessage)
     response = ResponseChat(AiMessage=ret)
     return response
 
-@app.post("/chainRetrieverHistory/{sessionId}", tags=["LLMs"])
+@app.post("/chain_retrieverHistory/{sessionId}", tags=["LLMs"])
 def retornaMensagem(sessionId: int, chat: InputChat)-> ResponseChat:
-    ret = chainRetrieverWithHistory(chat.HumamMessage, sessionId)
+    ret = chain_retriever_with_history(chat.HumamMessage, sessionId)
     response = ResponseChat(AiMessage=ret)
     return response
 
-@app.post("/chainRetrieverHistoryTitle/{sessionId}", tags=["LLMs"])
+@app.post("/chain_retrieverHistoryTitle/{sessionId}", tags=["LLMs"])
 def retornaMensagem(sessionId: int, chat: InputChat)-> ResponseChat:
-    ret = chainRetrieverWithHistoryTitle(chat.HumamMessage, sessionId)
+    ret = chain_retriever_with_history_title(chat.HumamMessage, sessionId)
     response = ResponseChat(AiMessage=ret)
     return response
 

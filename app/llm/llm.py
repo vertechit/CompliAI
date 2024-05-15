@@ -12,13 +12,13 @@ import json
 
 model = ChatOpenAI(model="gpt-3.5-turbo")
 
-def chainPiada(input: str) -> str:
+def chain_piada(input: str) -> str:
     prompt = ChatPromptTemplate.from_template("Me conte uma piada sobre {assunto}")
     output_parser = StrOutputParser()
     chain = (prompt | model | output_parser)
     return chain.invoke({"assunto":input})
 
-def chainTitulo(input: str) -> str:
+def chain_titulo(input: str) -> str:
     template =[
         (
             "system",
@@ -41,7 +41,7 @@ def chain(input: str) -> str:
     return chain.invoke({"assunto":input})
 
 
-def chainWithHistory(input: str, sessionId: int) -> str:
+def chain_with_history(input: str, sessionId: int) -> str:
     insertHistory(sessionId=sessionId, mensagem=input, tipo=1)
     template =[
         (
@@ -71,7 +71,7 @@ def chainWithHistory(input: str, sessionId: int) -> str:
     insertHistory(sessionId=sessionId, mensagem=ret, tipo=2)
     return ret
 
-def chainRetriever(input: str)->str:
+def chain_retriever(input: str)->str:
     template = """Responda a pergunta baseado somente no seguinte contexto:
 {context}
 
@@ -87,7 +87,7 @@ Pergunta: {question}
     ret = chain.invoke(input)
     return ret
 
-def chainRetrieverWithHistory(input: str, sessionId: int)-> str:
+def chain_retriever_with_history(input: str, sessionId: int)-> str:
     insertHistory(sessionId=sessionId, mensagem=input, tipo=1)
     template =[
         (
@@ -155,7 +155,7 @@ def chain_retriever_with_sources(input: str)-> dict:
     return ret
 
 #CompliAi - Issue 7
-def chainRetrieverWithHistoryTitle(input: str, sessionId: int)-> str:
+def chain_retriever_with_history_title(input: str, sessionId: int)-> str:
     saveSessao(pergunta=input, session_id=sessionId)
     insertHistory(sessionId=sessionId, mensagem=input, tipo=1)
     template =[
