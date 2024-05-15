@@ -1,0 +1,19 @@
+# pip index versions NOMEPACOTE
+chromadb==0.4.24
+langchain==0.1.14
+langchain-community==0.0.31
+langchain-core==0.1.40
+langchain-openai==0.1.1
+langsmith==0.1.41
+pypdf==4.2.0
+ipykernel==6.29.4
+bs4==0.0.2
+langchainhub==0.1.15
+oracledb==2.1.2
+qdrant-client==1.8.2
+peewee==3.17.3
+colorama==0.4.6
+psycopg2-binary==2.9.9
+validators==0.28.1
+python-multipart==0.0.9
+langchain-chroma==0.1.0

@@ -1,4 +1,6 @@
 *.db
+postgres.env
+chroma
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
