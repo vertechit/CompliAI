@@ -1,14 +1,14 @@
 #CompliAi - Issue 7
-from models.ChatSession import ChatSession
+from models.ChatHistory import ChatSession
 from typing import List
-from llm.llm import chainTitulo
+from llm import llm
 
 
 def saveSessao(pergunta: str, session_id: int):
     session = None
     session = ChatSession.select().where(ChatSession.session_id == session_id)
     if session == None:
-        titulo = chainTitulo(pergunta)
+        titulo = llm.chainTitulo(pergunta)
         session = ChatSession(session_id=session_id, titulo=titulo)
         session.save()
     else:

@@ -36,7 +36,7 @@
         }
       }) as { AiMessage: string}
       await MessagesModel.value.removeDotLoading()
-      MessagesModel.value.addMessage({date:'',id:'',type:'response',userId:5,message:result.AiMessage})
+      MessagesModel.value.addMessage({date:'',id:'',type:'response',userId:0,message:result.AiMessage})
     } catch (error) {
       console.log(error)
       await MessagesModel.value.removeDotLoading()
