@@ -13,7 +13,7 @@ from bs4 import SoupStrainer
 
 
 def destroyDatabases():
-    if os.getenv("RECREATE_DB", '0') == '1':
+    if os.getenv("RECREATE_DB", "0") == "1":
         vectorStore.dropCollection()
         if Documentos.Chunks.table_exists():
             Documentos.Chunks.drop_table()

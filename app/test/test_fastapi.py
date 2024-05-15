@@ -25,12 +25,12 @@ from utils.utils import destroyDatabases, initDatabases
 import os
 import logging
 
-try:
-    os.environ["RECREATE_DB"] = "1"
-    destroyDatabases()
-    initDatabases()
-except:
-    raise
+# try:
+#     os.environ["RECREATE_DB"] = "1"
+#     destroyDatabases()
+#     initDatabases()
+# except:
+#     raise
 
 LOGGER = logging.getLogger(__name__)
 client = TestClient(server.app)

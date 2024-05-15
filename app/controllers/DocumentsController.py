@@ -7,7 +7,6 @@ import hashlib
 import os
 
 def saveDocument(filepath: str | bytes, filename: str, descr: str)-> str:
-    file = None
     fileBytes = None
     md5file = None
     urlParam = None

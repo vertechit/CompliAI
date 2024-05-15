@@ -18,7 +18,7 @@ _doc_store = ""
 
 _embeddings_model = OpenAIEmbeddings()
 if _vectordb_type == "CHROMA":
-    _client = chromadb.Client()
+    _client = chromadb.PersistentClient()
     _doc_store = Chroma(client=_client,
                      collection_name=_collectionName,
                      embedding_function=_embeddings_model
@@ -30,7 +30,10 @@ else:
 
 def createCollection():
     if _vectordb_type == "CHROMA":
-        _client.get_or_create_collection(name=_collectionName)
+        try:
+            _client.get_collection(name=_collectionName)
+        except:
+            _client.create_collection(name=_collectionName)
     else:
         if not _client.collection_exists(_collectionName):
             _client.create_collection(collection_name=_collectionName,vectors_config=models.VectorParams(size=1536, distance=models.Distance.COSINE))
