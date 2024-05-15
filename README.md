@@ -1,3 +1,5 @@
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=vertechit_CompliAI&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=vertechit_CompliAI)
+
 # CompliAI
 Para utilizar este projeto recomendo utilizar o Linux e caso esteja no Windows utilizar o WSL  
   
@@ -41,7 +43,7 @@ python genie/main.py
 ### Subir aplicação inteira
 Para subir a aplicação copie o arquivo `example.env` para o arquivo `./deploy/.env` e substitua os valores das chaves de API antes de subir a aplicação
 ```
-docker compose --env-file ./deploy/.env up --build
+docker compose up --build
 # Para habilitar o Watch
 docker compose watch
 ```
