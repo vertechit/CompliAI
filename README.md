@@ -22,7 +22,7 @@ python -m venv .venv
 
 3. Instalar as bibliotecas
 ```
-pip install -r ./requirements.txt
+pip install -r ./app/requirements.txt
 ```
 
 ## Utilizar o Genie
@@ -30,17 +30,24 @@ Após o ambiente configurado é possível usar o "genie" que é um Chat com o GP
 Para abrir, digite
 ```
 # Linux
-python3 genie/genie.py
+python3 app/main.py
 
 # Windows
-python genie/genie.py
+python genie/main.py
 ```
-![Genie Compliance](./examples/image1.png)
+![Genie Compliance](./README/image1.png)
+
+
+### Subir aplicação inteira
+Para subir a aplicação copie o arquivo `example.env` para o arquivo `./deploy/.env` e substitua os valores das chaves de API antes de subir a aplicação
+```
+docker compose --env-file ./deploy/.env up --build
+# Para habilitar o Watch
+docker compose watch
+```
 
 ### Rodar a imagem Docker
 ```
-docker run -p 8080:80 -e OPENAI_API_KEY="....." devcst/compliai
-
 # Teste de chamada da API
 curl -X POST http://127.0.0.1:8080/chain --data '{"HumamMessage": "Quem é o presidente do Brasil?"}' -H "content-type: application/json"
 
@@ -52,23 +59,9 @@ curl -X 'POST' \
   -F 'file=@/mnt/c/dev/Repositorios/CompliAI/arquivos/salarios.csv'
 ```
 
-### Subir aplicação inteira
-Para subir a aplicação copie o arquivo `example.env` para o arquivo `.env` e substitua os valores das chaves de API antes de subir a aplicação
-```
-docker compose up --build
-# Para habilitar o Watch
-docker compose watch
-```
-
 ### Subir o Genie no Docker
 ```
-docker exec -it compliai-api-1 python3 main.py
-```
-
-### WebChat disponivel em :
-OBS : ENV do chat inserir do DockerFile
-```
-http://localhost:3000
+docker exec -it compliai-api-1 python3 ./app/main.py
 ```
 
 ### Links
