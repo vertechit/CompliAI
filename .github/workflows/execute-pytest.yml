@@ -1,6 +1,14 @@
 name: Execute PyTest
 
-on: [push]
+env:
+  PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+on:
+  push:
+    branches: "**"
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -20,13 +28,10 @@ jobs:
         run: pip install pytest pytest-md pytest-emoji
       - name: Install dependencies
         run: pip install --no-cache-dir --upgrade -r ./app/requirements.txt
-      - name: Export variable
-        run: echo "PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python" >> $GITHUB_ENV
-      - name: Export variable
-        run: echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
       - name: Execute test
         uses: pavelzw/pytest-action@v2
         with:
           emoji: true
           verbose: true
           job-summary: true
+          click-to-expand: false
