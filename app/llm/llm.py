@@ -13,8 +13,9 @@ import json
 model = ChatOpenAI(model="gpt-3.5-turbo")
 
 PROMPT_RESP_BASEADO_CONTEXTO = "Responda a pergunta baseado somente no seguinte contexto\n{context}"
+QUESTION_MARK = "{question}"
 
-template_history_question_and_context =[
+__template_history_question_and_context =[
     (
         "system",
         PROMPT_RESP_BASEADO_CONTEXTO
@@ -22,22 +23,22 @@ template_history_question_and_context =[
     MessagesPlaceholder(variable_name="history"),
     (
         "human",
-        "{question}"
+        QUESTION_MARK
     )
 ]
 
-template_context =[
+_template_context =[
     (
         "system",
         PROMPT_RESP_BASEADO_CONTEXTO
     ),
     (
         "human",
-        "{question}"
+        QUESTION_MARK
     )
 ]
 
-template_history_question =[
+_template_history_question =[
     (
         "system",
         "Responda a pergunta de forma resumida"
@@ -45,14 +46,15 @@ template_history_question =[
     MessagesPlaceholder(variable_name="history"),
     (
         "human",
-        "{question}"
+        QUESTION_MARK
     )
 ]
 
+_output_parser = StrOutputParser()
+
 def chain_piada(input: str) -> str:
     prompt = ChatPromptTemplate.from_template("Me conte uma piada sobre {assunto}")
-    output_parser = StrOutputParser()
-    chain = (prompt | model | output_parser)
+    chain = (prompt | model | _output_parser)
     return chain.invoke({"assunto":input})
 
 def chain_titulo(input: str) -> str:
@@ -67,24 +69,22 @@ def chain_titulo(input: str) -> str:
         )
     ]
     prompt = ChatPromptTemplate.from_messages(template)
-    output_parser = StrOutputParser()
-    chain = (prompt | model | output_parser)
+    chain = (prompt | model | _output_parser)
     return chain.invoke({"assunto":input})
 
 def chain(input: str) -> str:
     prompt = ChatPromptTemplate.from_template("{assunto}")
-    output_parser = StrOutputParser()
-    chain = (prompt | model | output_parser)
-    return chain.invoke({"assunto":input})
+    chain_run = (prompt | model | _output_parser)
+    return chain_run.invoke({"assunto":input})
 
 
 def chain_with_history(input: str, sessionId: int) -> str:
     insertHistory(sessionId=sessionId, mensagem=input, tipo=1)
-    prompt = ChatPromptTemplate.from_messages(template_history_question)
+    prompt = ChatPromptTemplate.from_messages(_template_history_question)
     chain = ( 
             prompt
             | model
-            | StrOutputParser()
+            | _output_parser
     )
 
     with_message_history = RunnableWithMessageHistory(
@@ -104,21 +104,21 @@ def chain_retriever(input: str)->str:
         {"context": getRetriever(), "question": RunnablePassthrough()}
         | prompt
         | model
-        | StrOutputParser()
+        | _output_parser
     )
     ret = chain.invoke(input)
     return ret
 
 def chain_retriever_with_history(input: str, sessionId: int)-> str:
     insertHistory(sessionId=sessionId, mensagem=input, tipo=1)
-    prompt = ChatPromptTemplate.from_messages(template_history_question_and_context)
+    prompt = ChatPromptTemplate.from_messages(__template_history_question_and_context)
     contextChain = itemgetter("question") | getRetriever() 
     first_step = RunnablePassthrough.assign(context=contextChain)
     chain = (
         first_step
         | prompt
         | model
-        | StrOutputParser()
+        | _output_parser
     )
     with_message_history = RunnableWithMessageHistory(
         chain,
@@ -134,13 +134,13 @@ def chain_retriever_with_history(input: str, sessionId: int)-> str:
     return ret
 
 def chain_retriever_with_sources(input: str)-> dict:
-    prompt = ChatPromptTemplate.from_messages(template_context)
+    prompt = ChatPromptTemplate.from_messages(_template_context)
 
     chain = (
         RunnablePassthrough.assign(context=itemgetter("documentos"), question=itemgetter("pergunta"))
         | prompt
         | model
-        | StrOutputParser()
+        | _output_parser
     )
 
     abc = RunnableParallel(
@@ -153,14 +153,14 @@ def chain_retriever_with_sources(input: str)-> dict:
 def chain_retriever_with_history_title(input: str, sessionId: int)-> str:
     saveSessao(pergunta=input, session_id=sessionId)
     insertHistory(sessionId=sessionId, mensagem=input, tipo=1)
-    prompt = ChatPromptTemplate.from_messages(template_history_question_and_context)
+    prompt = ChatPromptTemplate.from_messages(__template_history_question_and_context)
     contextChain = itemgetter("question") | getRetriever() 
     first_step = RunnablePassthrough.assign(context=contextChain)
     chain = (
         first_step
         | prompt
         | model
-        | StrOutputParser()
+        | _output_parser
     )
     with_message_history = RunnableWithMessageHistory(
         chain,
