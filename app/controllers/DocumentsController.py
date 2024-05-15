@@ -11,25 +11,21 @@ def saveDocument(filepath: str | bytes, filename: str, descr: str)-> str:
     fileBytes = None
     md5file = None
     urlParam = None
+    final_path = None
     if filepath[:4] == 'http':
         urlParam = filepath
         md5file = hashlib.sha512(filepath.encode("utf-8")).hexdigest()
-    elif isinstance(filepath, str):
-        filepath = os.path.join(os.path.dirname(__file__),'../arquivos',filepath)
-        file = open(filepath, 'rb')
-        fileBytes = file.read()
-        md5file = hashlib.sha512(fileBytes).hexdigest()
     elif isinstance(filepath, bytes):
         fileBytes = filepath
         md5file = hashlib.sha512(fileBytes).hexdigest()
-        filepath = os.path.join(tempfile.gettempdir(), f"/tempfile{get_extension(getMimetype(filename)[0])}")
-        with open(filepath, "wb") as f:
+        final_path = os.path.join(tempfile.gettempdir(), f"/tempfile{get_extension(getMimetype(filename)[0])}")
+        with open(final_path, "wb") as f:
             f.write(fileBytes)
     docExists = Documentos.select().where(Documentos.md5==md5file).first()
     if docExists==None:
         documento = Documentos(titulo=filename, descricao=descr, arquivo=fileBytes, md5=md5file, url=urlParam)
         documento.save()
-        docs = getDocuments(filepath)
+        docs = getDocuments(final_path)
         for doc in docs:
             doc.metadata['titulo'] = filename
         ids = loadDocuments(docs)
