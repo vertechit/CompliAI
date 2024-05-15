@@ -39,7 +39,11 @@ def initDatabases():
     if not Documentos.Chunks.table_exists():
         Documentos.Chunks.create_table()
 
+def get_extension(mimetype: str)->str:
+    return mimetypes.guess_extension(mimetype)
+
 def getMimetype(filepath: str)->str:
+    mimetypes.guess_extension
     return mimetypes.guess_type(filepath)
 
 def getDocuments(filepath: str)->List[Document]:

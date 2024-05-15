@@ -7,7 +7,6 @@ from controllers.UserController import create_user, login
 from typing import List
 from api.models import InputChat, ChunkObj, DocumentoApi, DocumentoObj, ResponseChat, SessaoObj, HistoricoObj
 from utils.utils import destroyDatabases, initDatabases
-import tempfile
 
 tags_metadata = [
     {"name": "LLMs", "description": "Chamadas para as LLMs"},
@@ -84,12 +83,9 @@ def listaDocumento(documento_id: int = None)-> DocumentoObj | None:
     return ret
 
 @app.post("/createDocument/", tags=["Documentos"])
-async def uploadFile(filename: str | None, description: str, file: UploadFile):
+async def uploadFile(description: str, file: UploadFile):
     contents = await file.read()
-    arquivoTemp = tempfile.gettempdir()+"/"+file.filename
-    with open(arquivoTemp, "wb") as f:
-        f.write(contents)
-    documento = saveDocument(arquivoTemp, filename, description)
+    documento = saveDocument(contents, file.filename, description)
     return {"retorno": documento}
 
 @app.post("/createDocumentUrl/", tags=["Documentos"])

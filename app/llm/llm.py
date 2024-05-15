@@ -8,7 +8,6 @@ from controllers.ChatHistoryController import getChatMessasgeHistoryBySession, i
 from controllers.ChatSessionController import saveSessao
 from vectors.vectorStore import getRetriever
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
-import json
 
 model = ChatOpenAI(model="gpt-3.5-turbo")
 

@@ -1,7 +1,8 @@
 from models.Documentos import Documentos, Chunks
 from vectors.vectorStore import loadDocuments, deleteDocument
-from utils.utils import getDocuments
+from utils.utils import getDocuments, getMimetype, get_extension
 from typing import List
+import tempfile
 import hashlib
 
 def saveDocument(filepath: str | bytes, filename: str, descr: str)-> str:
@@ -19,6 +20,9 @@ def saveDocument(filepath: str | bytes, filename: str, descr: str)-> str:
     elif isinstance(filepath, bytes):
         fileBytes = filepath
         md5file = hashlib.sha512(fileBytes).hexdigest()
+        filepath = tempfile.gettempdir()+f"/tempfile{get_extension(getMimetype(filename)[0])}"
+        with open(filepath, "wb") as f:
+            f.write(fileBytes)
     docExists = Documentos.select().where(Documentos.md5==md5file).first()
     if docExists==None:
         documento = Documentos(titulo=filename, descricao=descr, arquivo=fileBytes, md5=md5file, url=urlParam)
