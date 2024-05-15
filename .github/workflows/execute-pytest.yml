@@ -20,7 +20,10 @@ jobs:
         run: pip install pytest pytest-md pytest-emoji
       - name: Install dependencies
         run: pip install --no-cache-dir --upgrade -r ./app/requirements.txt
-      - uses: pavelzw/pytest-action@v2
+      - name: Export variable
+        run: export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
+      - name: Execute test
+        uses: pavelzw/pytest-action@v2
         with:
           emoji: true
           verbose: true
