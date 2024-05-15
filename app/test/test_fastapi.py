@@ -26,7 +26,7 @@ import os
 import logging
 
 try:
-    os.putenv("RECREATE_DB", '1')
+    os.environ["RECREATE_DB"] = "1"
     destroyDatabases()
     initDatabases()
 except:

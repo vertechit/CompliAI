@@ -14,6 +14,7 @@ def saveDocument(filepath: str | bytes, filename: str, descr: str)-> str:
     final_path = None
     if filepath[:4] == 'http':
         urlParam = filepath
+        final_path = urlParam
         md5file = hashlib.sha512(filepath.encode("utf-8")).hexdigest()
     elif isinstance(filepath, bytes):
         fileBytes = filepath
