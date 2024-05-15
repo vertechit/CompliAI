@@ -1,7 +1,7 @@
 from fastapi import Body, FastAPI, UploadFile, HTTPException
 from llm.llm import chain, chainWithHistory, chainPiada, chainRetriever, chainRetrieverWithHistory, chainRetrieverWithHistoryTitle
 from controllers.DocumentsController import saveDocument, deleteDocumento, listDocumentos
-from controllers.ChatSessionController import deleteSessao
+from controllers.ChatSessionController import deleteSessao, listSessao
 from controllers.ChatHistoryController import getChatMessasgeHistoryBySession
 from controllers.UserController import create_user, login
 from typing import List
@@ -105,9 +105,9 @@ def deletaDocumento(documento_id: int):
 
 # APIS de controle de Chats
 @app.get("/listSession/{session_id}", tags=["Chat"])
-def listaSessao(session_id: int = None)-> SessaoObj | None:
+def getSessao(session_id: int = None)-> SessaoObj | None:
     ret: SessaoObj = None
-    sessoes = listaSessao(session_id)
+    sessoes = listSessao(session_id)
     if len(sessoes) == 0:
         return None
     for sessao in sessoes:
