@@ -28,7 +28,7 @@ services:
       - "6333:6333"
   webchat:
     build:
-      context:  ./web/chat
-      dockerfile: ../../deploy/web.dockerfile
+      context:  ./web
+      dockerfile: ../deploy/web.dockerfile
     ports:
       - "80:3000"

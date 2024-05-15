@@ -11,14 +11,14 @@ def saveDocument(filepath: str | bytes, filename: str, descr: str)-> str:
     urlParam = None
     if filepath[:4] == 'http':
         urlParam = filepath
-        md5file = hashlib.md5(filepath.encode("utf-8")).hexdigest()
+        md5file = hashlib.sha512(filepath.encode("utf-8")).hexdigest()
     elif isinstance(filepath, str):
         file = open(filepath, 'rb')
         fileBytes = file.read()
-        md5file = hashlib.md5(fileBytes).hexdigest()
+        md5file = hashlib.sha512(fileBytes).hexdigest()
     elif isinstance(filepath, bytes):
         fileBytes = filepath
-        md5file = hashlib.md5(fileBytes).hexdigest()
+        md5file = hashlib.sha512(fileBytes).hexdigest()
     docExists = Documentos.select().where(Documentos.md5==md5file).first()
     if docExists==None:
         documento = Documentos(titulo=filename, descricao=descr, arquivo=fileBytes, md5=md5file, url=urlParam)
@@ -28,7 +28,7 @@ def saveDocument(filepath: str | bytes, filename: str, descr: str)-> str:
             doc.metadata['titulo'] = filename
         ids = loadDocuments(docs)
         for i, doc in enumerate(docs):
-            md5 = hashlib.md5(doc.page_content.encode(encoding="utf-8")).hexdigest()
+            md5 = hashlib.sha512(doc.page_content.encode(encoding="utf-8")).hexdigest()
             chunk = Chunks(id_vector=ids[i], md5=md5, documento_id=documento, conteudo=doc.page_content)
             chunk.save()
         return(f"Documento criado {documento}")
