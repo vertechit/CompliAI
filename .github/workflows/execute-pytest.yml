@@ -20,8 +20,6 @@ jobs:
         run: pip install pytest pytest-md pytest-emoji
       - name: Install dependencies
         run: pip install --no-cache-dir --upgrade -r ./app/requirements.txt
-      - name: Export variable
-        run: echo "PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python" >> $GITHUB_ENV
       - name: Execute test
         uses: pavelzw/pytest-action@v2
         with:
