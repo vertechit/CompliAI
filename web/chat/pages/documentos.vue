@@ -1,9 +1,9 @@
 <template>
     <main class="">
-        <CardsDocuments></CardsDocuments>
+        <CardsDocuments :forceGetList="forceGetList"></CardsDocuments>
         <SlideOversWithFooter  v-if="modaImportarArquivo" title="Importar Arquivo" @close="changeModaImportarArquivo(false)" >
             <template #content>
-                <FormFormsImportarArquivo :clear-form="clearForm" :submit-form="submitForm" @close="changeModaImportarArquivo(false)" />
+                <FormFormsImportarArquivo :clear-form="clearForm" :submit-form="submitForm" @close="forceGetList = !forceGetList ,changeModaImportarArquivo(false)"  />
             </template>
             <template #footer>
                 <div class="space-x-2">
@@ -12,7 +12,7 @@
                 </div>
             </template>
         </SlideOversWithFooter>
-        <div class="floating-button left-[50%] md:left-[60%]">
+        <div v-if="!defaultStorePinia.loading" class="floating-button left-[50%] md:left-[60%]">
             <buttonsIcon label="Adicionar" @action="changeModaImportarArquivo(true)">
                 <template #icon>
                     <PlusCircleIcon class="w-5 h-5"></PlusCircleIcon>
@@ -21,17 +21,21 @@
         </div>
 
     </main>
-
 </template>
 
 <script setup lang="ts">
-import { EnvelopeIcon,PlusCircleIcon,TrashIcon } from '@heroicons/vue/20/solid'
+import { PlusCircleIcon } from '@heroicons/vue/20/solid'
 import buttonsDefault from '@/components/buttons/default.vue'
 import SlideOversWithFooter from '@/components/slideOvers/withFooter.vue'
+import {defaultStore} from '@/stores/default'
+const defaultStorePinia = defaultStore()
 const modaImportarArquivo = ref(false)
 const changeModaImportarArquivo = (value: boolean) => modaImportarArquivo.value = value
 const submitForm = ref(false)
 const clearForm = ref(false)
+const forceGetList = ref(false)
+
+
 </script>
 <style scoped>
 .floating-button {

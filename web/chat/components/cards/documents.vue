@@ -18,6 +18,7 @@
                 <div class="-mt-px flex divide-x divide-gray-200">
                     <div class="-ml-px flex w-0 flex-1">
                         <button
+                            @click="isOpenModalDelete = true; currentElement = document.documento_id"
                             class="relative inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-br-lg border border-transparent py-4 text-sm font-semibold text-red-500">
                             <TrashIcon class="h-5 w-5 text-red-400" aria-hidden="true" />
                             Excluir
@@ -27,27 +28,63 @@
             </div>
         </li>
     </ul>
+    <ModalConfirmDelete
+    title="Atenção"
+    text="Deseja realmente excluir o documento?"
+    :isOpen="isOpenModalDelete"
+    @confirm="deleteDocument(currentElement)"
+    >
+
+    </ModalConfirmDelete>
 
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, watch } from 'vue'
 import { Documents } from '@/models/Documents/List'
-import { EnvelopeIcon, PlusCircleIcon, TrashIcon } from '@heroicons/vue/20/solid'
-
-defineProps({
-    listDocuments: Array<Documents>
+import { TrashIcon } from '@heroicons/vue/20/solid'
+import {defaultStore} from '@/stores/default'
+const defaultStorePinia = defaultStore()
+const props = defineProps({
+    listDocuments: Array<Documents>,
+    forceGetList: Boolean
 })
-
+const isOpenModalDelete = ref(false)
 const listDocuments = ref<Documents[]>([])
+let currentElement = ref(0)
 const getList = async () => {
     try {
+        setLoading(true)
         const response = await $fetch('/api/documents/list') as Documents[]
         listDocuments.value = response
     } catch (error) {
         console.error(error)
+    }finally{
+        setLoading(false)
     }
 }
+const deleteDocument = async (documentId: number) => {
+    try {
+        setLoading(true)
+        await $fetch(`/api/documents/${documentId}`, {
+            method: 'DELETE'
+        })
+        await getList()
+    } catch (error) {
+        console.error(error)
+    }finally{
+        setLoading(false)
+        currentElement.value = 0
+        isOpenModalDelete.value = false
+    }
+}
+const setLoading = (loading:boolean) => {
+    defaultStorePinia.setLoading(loading)
+  }
 onMounted(async () => {
+    await getList()
+})
+watch(() => props.forceGetList, async() => {
     await getList()
 })
 </script>
