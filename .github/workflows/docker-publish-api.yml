@@ -1,9 +1,11 @@
 name: Publish Docker for API
 
 on:
-    push:
-      branches:
-        - 'main'
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   push_to_registry:
@@ -27,22 +29,21 @@ jobs:
       - name: Branch name
         run: echo running on branch ${{ steps.extract_branch.outputs.branch }}
 
+      - name: Validate Build Docker image
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        if: github.event_name == 'pull_request'
+        with:
+          context: .
+          file: ./deploy/app.dockerfile
+          push: false
+
       - name: Build and push Docker image PROD
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
         if: github.ref == 'refs/heads/main'
         with:
           context: .
-          file: ./Dockerfile
+          file: ./deploy/app.dockerfile
           push: true
           tags: |
             "devcst/compliai"
             "devcst/compliai:${{github.run_number}}"
-
-      - name: Build and push Docker image PROD
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
-        if: github.ref != 'refs/heads/main'
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: "devcst/compliai:${{ steps.extract_branch.outputs.branch }}"
