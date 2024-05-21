@@ -20,12 +20,19 @@
 
 <script setup lang="ts">
 import FormComponentesInputUpload from '@/components/form/componentes/inputUpload.vue'
-
+import {useNotificationStore} from '@/stores/notification'
+import {defaultStore} from '@/stores/default'
+const notificationStore = useNotificationStore()
+const defaultStorePinia = defaultStore()
 const emit = defineEmits(['close'])
 const props = defineProps({
     clearForm: Boolean,
     submitForm: Boolean
 })
+
+const setLoading = (loading:boolean) => {
+    defaultStorePinia.setLoading(loading)
+  }
 
 const form = ref({
     files: [] as any[],
@@ -35,17 +42,25 @@ watch(() => props.clearForm, () => {
     alert('clearForm')
 })
 watch(() => props.submitForm, async() => {
-    const formData = new FormData()
-    console.log(form.value.files[0])
-    let name = form.value.files[0]?.name || 'file'  
-    formData.append('file', form.value.files[0]);
-    formData.append('description', form.value.description);
-    await $fetch('/api/documents/create', {
-        method: 'POST',
-        body: formData
-    })
+    try {
+        setLoading(true)
+        const formData = new FormData()
+        formData.append('file', form.value.files[0]);
+        formData.append('description', form.value.description);
+        await $fetch('/api/documents/create', {
+            method: 'POST',
+            body: formData
+        })
+        notificationStore.successNotification(null,'Arquivo enviado com sucesso')
+        emit('close')
+    } catch (error) {
+        notificationStore.errorNotification(null,'Erro ao enviar arquivo')
+    }finally{
+        setLoading(false)
+        form.value.files = []
+        form.value.description = ''
+    }
 
-    emit('close')
 })
 
 </script>
