@@ -42,7 +42,7 @@ def retornaMensagem(sessionId: int, chat: InputChat)-> ResponseChat:
     return response
 
 @app.post("/chain_retriever", tags=["LLMs"])
-def retornaMensagem(sessionId: int, chat: InputChat)-> ResponseChat:
+def retornaMensagem(chat: InputChat)-> ResponseChat:
     ret = chain_retriever(chat.HumamMessage)
     response = ResponseChat(AiMessage=ret)
     return response
