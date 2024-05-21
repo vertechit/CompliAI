@@ -6,7 +6,7 @@ export default defineEventHandler(async (e) => {
       
       const { baseURL}  = useRuntimeConfig().public
       const { SystemMessage, HumamMessage} = await readBody(e)
-      const data = await $fetch(`/chain`, {
+      const data = await $fetch(`/chain_retriever`, {
          baseURL: baseURL,
          method: 'POST',
          timeout: 10000,
