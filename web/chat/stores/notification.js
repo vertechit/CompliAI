@@ -10,7 +10,7 @@ export const useNotificationStore = defineStore('notification', {
     addNotification(payload) {
       this.notifications.push({
         ...payload,
-        id: ("0."+crypto.randomInt(0, parseInt(100000000000000)).toString(36) + Date.now().toString(36)).substr(2),
+        id: (Math.random().toString(36) + Date.now().toString(36)).substr(2),
       });
     },
     removeNotification(payload) {
