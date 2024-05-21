@@ -18,7 +18,7 @@ def saveDocument(filepath: str | bytes, filename: str, descr: str)-> str:
     elif isinstance(filepath, bytes):
         fileBytes = filepath
         md5file = hashlib.sha512(fileBytes).hexdigest()
-        final_path = os.path.join(tempfile.gettempdir(), f"/tempfile{get_extension(getMimetype(filename)[0])}")
+        final_path = os.path.join(tempfile.gettempdir(), f"tempfile{get_extension(getMimetype(filename)[0])}")
         with open(final_path, "wb") as f:
             f.write(fileBytes)
     docExists = Documentos.select().where(Documentos.md5==md5file).first()
