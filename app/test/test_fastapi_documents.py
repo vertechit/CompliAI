@@ -11,29 +11,30 @@ try:
         )
     )
 
-    if 'POSTGRES_HOST' in os.environ:
-        del os.environ["POSTGRES_HOST"]
-    if 'VECTORDB' in os.environ:
-        del os.environ["VECTORDB"]
-
 except:
     raise
 
+import pytest
 from fastapi.testclient import TestClient
 from api import server
 from utils.utils import destroyDatabases, initDatabases
 import os
 import logging
-
-# try:
-#     os.environ["RECREATE_DB"] = "1"
-#     destroyDatabases()
-#     initDatabases()
-# except:
-#     raise
+from dotenv import load_dotenv
 
 LOGGER = logging.getLogger(__name__)
 client = TestClient(server.app)
+
+@pytest.fixture
+def start_database():
+    load_dotenv()
+    if 'POSTGRES_HOST' in os.environ:
+        del os.environ["POSTGRES_HOST"]
+    if 'VECTORDB' in os.environ:
+        del os.environ["VECTORDB"]
+    os.environ["RECREATE_DB"] = "1"
+    destroyDatabases()
+    initDatabases()
 
 def test_read_main():
     response = client.get("/")
