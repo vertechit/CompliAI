@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import { type Documents } from '@/models/Documents/List'
+import { Documents } from '@/models/Documents/List'
 import { TrashIcon } from '@heroicons/vue/20/solid'
 import {defaultStore} from '@/stores/default'
 const defaultStorePinia = defaultStore()
