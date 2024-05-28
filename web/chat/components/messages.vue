@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { type IMessage } from '@/models/Message';
+import { IMessage } from '@/models/Message';
 import dots from './utils/dots.vue';
 
 const props = defineProps({
