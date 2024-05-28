@@ -33,6 +33,7 @@
     text="Deseja realmente excluir o documento?"
     :isOpen="isOpenModalDelete"
     @confirm="deleteDocument(currentElement)"
+    @close="close()"
     >
 
     </ModalConfirmDelete>
@@ -41,7 +42,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import { Documents } from '@/models/Documents/List'
+import { type Documents } from '@/models/Documents/List'
 import { TrashIcon } from '@heroicons/vue/20/solid'
 import {defaultStore} from '@/stores/default'
 const defaultStorePinia = defaultStore()
@@ -63,6 +64,11 @@ const getList = async () => {
         setLoading(false)
     }
 }
+const close = async () => {
+    isOpenModalDelete.value = false;
+    currentElement.value = 0
+}
+
 const deleteDocument = async (documentId: number) => {
     try {
         setLoading(true)

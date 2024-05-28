@@ -1,12 +1,15 @@
-from fastapi import Body, FastAPI, UploadFile, HTTPException
+from fastapi import Body, FastAPI, UploadFile, HTTPException, Depends, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from llm.llm import chain, chain_with_history, chain_piada, chain_retriever, chain_retriever_with_history, chain_retriever_with_history_title
 from controllers.DocumentsController import saveDocument, deleteDocumento, listDocumentos
 from controllers.ChatSessionController import deleteSessao, listSessao
 from controllers.ChatHistoryController import getChatMessasgeHistoryBySession
-from controllers.UserController import create_user, login
-from typing import List
-from api.models import InputChat, ChunkObj, DocumentoApi, DocumentoObj, ResponseChat, SessaoObj, HistoricoObj
+from controllers.UserController import create_user, login, delete_user
+from typing import List, Annotated
+from api.models import InputChat, ChunkObj, inputDocumentoApi, DocumentoObj, ResponseChat, SessaoObj, HistoricoObj, inputUser, inputUsername
 from utils.utils import destroyDatabases, initDatabases
+from api.auth import create_access_token, Token, ACCESS_TOKEN_EXPIRE_MINUTES
+from datetime import timedelta
 
 tags_metadata = [
     {"name": "LLMs", "description": "Chamadas para as LLMs"},
@@ -15,10 +18,17 @@ tags_metadata = [
     {"name": "Chat", "description":"Controle da sessão do Chat"},
 ]
 
+
 destroyDatabases()
 initDatabases()
 
 app = FastAPI(openapi_tags=tags_metadata)
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+@app.get("/items/")
+async def read_items(token: Annotated[str, Depends(oauth2_scheme)]):
+    return {"token": token}
 
 @app.get("/")
 async def read_main():
@@ -89,7 +99,7 @@ async def uploadFile(description: str, file: UploadFile):
     return {"retorno": documento}
 
 @app.post("/createDocumentUrl/", tags=["Documentos"])
-async def uploadFileUrl(documento: DocumentoApi):
+async def uploadFileUrl(documento: inputDocumentoApi):
     documento = saveDocument(documento.url, documento.titulo, documento.description)
     return {"retorno": documento}
 
@@ -127,15 +137,34 @@ def deletaSessao(session_id: int):
 
 # APIS de controle de Usuários
 @app.post("/createUsers", tags=["Usuários"])
-def createUserAPI(usuario: str, password:str):
+def createUserAPI(user: inputUser):
     usu:int = 0
     try:
-        usu = create_user(usuario, password)
+        usu = create_user(user.username, user.password)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return usu
+
+@app.post("/deleteUsers", tags=["Usuários"])
+def delete_usuario(user: inputUsername):
+    usu:int = 0
+    try:
+        usu = delete_user(user.username)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     return {"usuario_id": usu}
 
-@app.post("/login", tags=["Usuários"])
-def loginAPI(usuario: str, password:str):
-    usu = login(usuario, password)
-    return {"usuario_id": usu}
+@app.post("/token", tags=["Usuários"])
+def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
+    user = login(form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user['login']}, expires_delta=access_token_expires
+    )
+    return Token(access_token=access_token, token_type="bearer")

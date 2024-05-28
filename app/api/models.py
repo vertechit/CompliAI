@@ -27,7 +27,7 @@ class SessaoObj(BaseModel):
     titulo: str
     criado: str
     
-class DocumentoApi(BaseModel):
+class inputDocumentoApi(BaseModel):
     titulo: str
     description: str
     url: str
@@ -37,3 +37,10 @@ class HistoricoObj(BaseModel):
     session_id: int
     mensagem: str
     tipo: int
+    
+class inputUser(BaseModel):
+    username: str
+    password: str
+    
+class inputUsername(BaseModel):
+    username: str
