@@ -3,7 +3,7 @@ FROM python:3.10
 ENV APP_HOME=/code
 ENV APP_USER=appuser
 
-RUN adduser --home $APP_HOME $APP_USER
+RUN adduser --home "$APP_HOME" "$APP_USER"
 
 USER $APP_USER
 
