@@ -1,7 +1,7 @@
 from fastapi import Body, FastAPI, UploadFile, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from llm.llm import chain, chain_with_history, chain_piada, chain_retriever, chain_retriever_with_history, chain_retriever_with_history_title
-from controllers.DocumentsController import saveDocument, deleteDocumento, listDocumentos
+from controllers.DocumentsController import save_document, delete_document, list_documents
 from controllers.ChatSessionController import deleteSessao, listSessao
 from controllers.ChatHistoryController import getChatMessasgeHistoryBySession
 from controllers.UserController import create_user, login, delete_user
@@ -69,7 +69,7 @@ def llm_chain_retriever_hist_title_api(session_id: int, chat: InputChat)-> Respo
 @app.get("/listDocument", tags=["Documentos"])
 def lista_documentos_api()-> List[DocumentoObj] | None:
     ret: List[DocumentoObj] = []
-    documentos = listDocumentos(None)
+    documentos = list_documents()
     if len(documentos) == 0:
         return None
     for doc in documentos:
@@ -80,7 +80,7 @@ def lista_documentos_api()-> List[DocumentoObj] | None:
 @app.get("/listDocument/{documento_id}", tags=["Documentos"])
 def lista_documento_api(documento_id: int = None)-> DocumentoObj | None:
     ret: Optional[DocumentoObj] = None
-    documentos = listDocumentos(documento_id)
+    documentos = list_documents(documento_id)
     if len(documentos) == 0:
         return None
     for doc in documentos:
@@ -91,17 +91,17 @@ def lista_documento_api(documento_id: int = None)-> DocumentoObj | None:
 @app.post("/createDocument/", tags=["Documentos"])
 async def upload_file_api(description: str, file: UploadFile):
     contents = await file.read()
-    documento = saveDocument(contents, file.filename, description)
+    documento = save_document(contents, file.filename, description)
     return {"retorno": documento}
 
 @app.post("/createDocumentUrl/", tags=["Documentos"])
 def upload_file_url_api(documento: InputDocumentoApi):
-    documento = saveDocument(documento.url, documento.titulo, documento.description)
+    documento = save_document(documento.url, documento.titulo, documento.description)
     return {"retorno": documento}
 
 @app.delete("/deleteDocument/{documento_id}", tags=["Documentos"])
 def deleta_documento_api(documento_id: int):
-    deleteDocumento(documento_id)
+    delete_document(documento_id)
     return {"retorno": "Deletado"}
 
 
