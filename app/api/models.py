@@ -27,10 +27,10 @@ class SessaoObj(BaseModel):
     titulo: str
     criado: str
     
-class inputDocumentoApi(BaseModel):
-    titulo: str
+class InputDocumentoApi(BaseModel):
+    titulo: str | None
     description: str
-    url: str
+    url: str | None
 
 class HistoricoObj(BaseModel):
     chathistory_id: int
@@ -38,9 +38,9 @@ class HistoricoObj(BaseModel):
     mensagem: str
     tipo: int
     
-class inputUser(BaseModel):
+class InputUser(BaseModel):
     username: str
     password: str
     
-class inputUsername(BaseModel):
+class InputUsername(BaseModel):
     username: str

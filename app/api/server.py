@@ -1,12 +1,12 @@
 from fastapi import Body, FastAPI, UploadFile, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from llm.llm import chain, chain_with_history, chain_piada, chain_retriever, chain_retriever_with_history, chain_retriever_with_history_title
-from controllers.DocumentsController import saveDocument, deleteDocumento, listDocumentos
+from controllers.DocumentsController import save_document, delete_document, list_documents
 from controllers.ChatSessionController import deleteSessao, listSessao
 from controllers.ChatHistoryController import getChatMessasgeHistoryBySession
 from controllers.UserController import create_user, login, delete_user
-from typing import List, Annotated
-from api.models import InputChat, ChunkObj, inputDocumentoApi, DocumentoObj, ResponseChat, SessaoObj, HistoricoObj, inputUser, inputUsername
+from typing import List, Annotated, Optional
+from api.models import InputChat, ChunkObj, InputDocumentoApi, DocumentoObj, ResponseChat, SessaoObj, HistoricoObj, InputUser, InputUsername
 from utils.utils import destroyDatabases, initDatabases
 from api.auth import create_access_token, Token, ACCESS_TOKEN_EXPIRE_MINUTES
 from datetime import timedelta
@@ -30,50 +30,46 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 async def read_items(token: Annotated[str, Depends(oauth2_scheme)]):
     return {"token": token}
 
-@app.get("/")
-async def read_main():
-    return {"msg": "Hello World"}
-
 # APIS de LLMS
 @app.post("/piada", tags=["LLMs"])
-def retornaMensagem(mensagem=Body()):
+def llm_piada_api(mensagem=Body()):
     return {"retorno": chain_piada(mensagem)}
 
 @app.post("/chain", tags=["LLMs"])
-def retornaMensagem(chat: InputChat)-> ResponseChat:
+def llm_chain_api(chat: InputChat)-> ResponseChat:
     ret = chain(chat.HumamMessage)
     response = ResponseChat(AiMessage=ret)
     return response
 
-@app.post("/chainHistory/{sessionId}", tags=["LLMs"])
-def retornaMensagem(sessionId: int, chat: InputChat)-> ResponseChat:
-    ret = chain_with_history(chat.HumamMessage, sessionId)
+@app.post("/chainHistory/{session_id}", tags=["LLMs"])
+def llm_chain_history_api(session_id: int, chat: InputChat)-> ResponseChat:
+    ret = chain_with_history(chat.HumamMessage, session_id)
     response = ResponseChat(AiMessage=ret)
     return response
 
 @app.post("/chain_retriever", tags=["LLMs"])
-def retornaMensagem(chat: InputChat)-> ResponseChat:
+def llm_chain_retriever_api(chat: InputChat)-> ResponseChat:
     ret = chain_retriever(chat.HumamMessage)
     response = ResponseChat(AiMessage=ret)
     return response
 
-@app.post("/chain_retrieverHistory/{sessionId}", tags=["LLMs"])
-def retornaMensagem(sessionId: int, chat: InputChat)-> ResponseChat:
-    ret = chain_retriever_with_history(chat.HumamMessage, sessionId)
+@app.post("/chain_retrieverHistory/{session_id}", tags=["LLMs"])
+def llm_chain_retriever_hist_api(session_id: int, chat: InputChat)-> ResponseChat:
+    ret = chain_retriever_with_history(chat.HumamMessage, session_id)
     response = ResponseChat(AiMessage=ret)
     return response
 
-@app.post("/chain_retrieverHistoryTitle/{sessionId}", tags=["LLMs"])
-def retornaMensagem(sessionId: int, chat: InputChat)-> ResponseChat:
-    ret = chain_retriever_with_history_title(chat.HumamMessage, sessionId)
+@app.post("/chain_retrieverHistoryTitle/{session_id}", tags=["LLMs"])
+def llm_chain_retriever_hist_title_api(session_id: int, chat: InputChat)-> ResponseChat:
+    ret = chain_retriever_with_history_title(chat.HumamMessage, session_id)
     response = ResponseChat(AiMessage=ret)
     return response
 
 # APIS de Documentos
 @app.get("/listDocument", tags=["Documentos"])
-def listaDocumento()-> List[DocumentoObj] | None:
+def lista_documentos_api()-> List[DocumentoObj] | None:
     ret: List[DocumentoObj] = []
-    documentos = listDocumentos(None)
+    documentos = list_documents()
     if len(documentos) == 0:
         return None
     for doc in documentos:
@@ -82,9 +78,9 @@ def listaDocumento()-> List[DocumentoObj] | None:
     return ret
 
 @app.get("/listDocument/{documento_id}", tags=["Documentos"])
-def listaDocumento(documento_id: int = None)-> DocumentoObj | None:
-    ret: DocumentoObj = None
-    documentos = listDocumentos(documento_id)
+def lista_documento_api(documento_id: int = None)-> DocumentoObj | None:
+    ret: Optional[DocumentoObj] = None
+    documentos = list_documents(documento_id)
     if len(documentos) == 0:
         return None
     for doc in documentos:
@@ -93,26 +89,26 @@ def listaDocumento(documento_id: int = None)-> DocumentoObj | None:
     return ret
 
 @app.post("/createDocument/", tags=["Documentos"])
-async def uploadFile(description: str, file: UploadFile):
+async def upload_file_api(description: str, file: UploadFile):
     contents = await file.read()
-    documento = saveDocument(contents, file.filename, description)
+    documento = save_document(contents, file.filename, description)
     return {"retorno": documento}
 
 @app.post("/createDocumentUrl/", tags=["Documentos"])
-async def uploadFileUrl(documento: inputDocumentoApi):
-    documento = saveDocument(documento.url, documento.titulo, documento.description)
+def upload_file_url_api(documento: InputDocumentoApi):
+    documento = save_document(documento.url, documento.titulo, documento.description)
     return {"retorno": documento}
 
 @app.delete("/deleteDocument/{documento_id}", tags=["Documentos"])
-def deletaDocumento(documento_id: int):
-    deleteDocumento(documento_id)
+def deleta_documento_api(documento_id: int):
+    delete_document(documento_id)
     return {"retorno": "Deletado"}
 
 
 # APIS de controle de Chats
 @app.get("/listSession/{session_id}", tags=["Chat"])
-def getSessao(session_id: int = None)-> SessaoObj | None:
-    ret: SessaoObj = None
+def get_sessao_api(session_id: int = None)-> SessaoObj | None:
+    ret: Optional[SessaoObj] = None
     sessoes = listSessao(session_id)
     if len(sessoes) == 0:
         return None
@@ -121,8 +117,8 @@ def getSessao(session_id: int = None)-> SessaoObj | None:
     return ret
 
 @app.get("/listHistory/{session_id}", tags=["Chat"])
-def listahistorico(session_id: int)-> HistoricoObj | None:
-    ret: HistoricoObj = None
+def lista_historico_api(session_id: int)-> HistoricoObj | None:
+    ret: Optional[HistoricoObj] = None
     historicos = getChatMessasgeHistoryBySession(session_id)
     if len(historicos) == 0:
         return None
@@ -131,13 +127,13 @@ def listahistorico(session_id: int)-> HistoricoObj | None:
     return ret
 
 @app.delete("/deleteSession/{session_id}", tags=["Chat"])
-def deletaSessao(session_id: int):
+def deleta_sessao_api(session_id: int):
     deleteSessao(session_id)
     return {"retorno": "Sessão Deletada"}
 
 # APIS de controle de Usuários
 @app.post("/createUsers", tags=["Usuários"])
-def createUserAPI(user: inputUser):
+def create_user_api(user: InputUser):
     usu:int = 0
     try:
         usu = create_user(user.username, user.password)
@@ -146,7 +142,7 @@ def createUserAPI(user: inputUser):
     return usu
 
 @app.post("/deleteUsers", tags=["Usuários"])
-def delete_usuario(user: inputUsername):
+def delete_usuario(user: InputUsername):
     usu:int = 0
     try:
         usu = delete_user(user.username)

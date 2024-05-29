@@ -8,7 +8,7 @@ def saveSessao(pergunta: str, session_id: int):
     session = None
     session = ChatSession.select().where(ChatSession.session_id == session_id)
     if session == None:
-        titulo = llm.chainTitulo(pergunta)
+        titulo = llm.chain_titulo(pergunta)
         session = ChatSession(session_id=session_id, titulo=titulo)
         session.save()
     else:

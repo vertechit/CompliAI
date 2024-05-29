@@ -6,7 +6,7 @@ import tempfile
 import hashlib
 import os
 
-def saveDocument(filepath: str | bytes, filename: str, descr: str)-> str:
+def save_document(filepath: str | bytes, filename: str, descr: str)-> str:
     fileBytes = None
     md5file = None
     urlParam = None
@@ -37,7 +37,7 @@ def saveDocument(filepath: str | bytes, filename: str, descr: str)-> str:
     else:
         return(f"Documento já existe {docExists}")
 
-def deleteDocumento(documento_id: int)-> str:
+def delete_document(documento_id: int)-> str:
     doc = Documentos.select().where(Documentos.documento_id==documento_id).first()
     idsVector = []
     if doc == None:
@@ -50,7 +50,7 @@ def deleteDocumento(documento_id: int)-> str:
         Documentos.delete().where(Documentos.documento_id==documento_id).execute()
         return "Documento deletado" 
 
-def listDocumentos(documento_id: int = None)-> List[Documentos]:
+def list_documents(documento_id: int = None)-> List[Documentos]:
     docs = None
     array = []
     if documento_id==None:
