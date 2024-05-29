@@ -1,9 +1,9 @@
-FROM node:latest
+FROM node:22
 
 ENV APP_HOME=/usr/src/app
 ENV APP_USER=appuser
 
-RUN adduser --home $APP_HOME $APP_USER
+RUN adduser --home "$APP_HOME" "$APP_USER"
 USER $APP_USER
 WORKDIR $APP_HOME
 
