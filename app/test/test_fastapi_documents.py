@@ -18,7 +18,6 @@ import pytest
 from fastapi.testclient import TestClient
 from api import server
 from utils.utils import destroyDatabases, initDatabases
-import os
 import logging
 from dotenv import load_dotenv
 
@@ -36,10 +35,27 @@ def start_database():
     destroyDatabases()
     initDatabases()
 
-def test_read_main():
-    response = client.get("/")
+def test_cria_documento_file():
+    """
+    Teste para criação de um documento passando um arquivo
+    O retorno deve ser uma dict com o texto {'retorno': 'Documento criado 1'}
+    """
+    response = client.post(
+        "/createDocument",
+        params={"description":"teste"},
+        files={"file": ("gympass.pdf", open('app/test/gympass.pdf', "rb"), "application/pdf")}
+    )
     assert response.status_code == 200
-    assert response.json() == {"msg": "Hello World"}
+    assert response.json() == {'retorno': 'Documento criado 1'}
+    
+def test_deleta_documento_file():
+    """
+    Teste para deletar um documento criado
+    O retorno deve ser um json {"retorno": "Deletado"}
+    """
+    response = client.delete("/deleteDocument/1")
+    assert response.status_code == 200
+    assert response.json() == {"retorno": "Deletado"}
     
 def test_cria_documento_url():
     """
@@ -99,7 +115,7 @@ def test_lista_documentos():
     assert isinstance(resp_obj['url'], str)
     assert isinstance(resp_obj['chunks'], list)
     
-def test_deleta_documentos():
+def test_deleta_documento_url():
     """
     Teste para deletar um documento criado
     O retorno deve ser um json {"retorno": "Deletado"}
