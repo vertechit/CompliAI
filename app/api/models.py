@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List
+from datetime import datetime
 
 class InputChat(BaseModel):
     SystemMessage: str | None = Field(default=None, examples=["Responde de forma educada"])
@@ -24,8 +25,8 @@ class DocumentoObj(BaseModel):
 
 class SessaoObj(BaseModel):
     session_id: int
-    titulo: str
-    criado: str
+    titulo: str | None
+    criado: datetime
     
 class InputDocumentoApi(BaseModel):
     titulo: str | None
