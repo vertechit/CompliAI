@@ -2,9 +2,21 @@
 from models.ChatHistory import ChatSession
 from typing import List
 from llm import llm
+from peewee import fn
 
+def create_sessao(pergunta: str = None) -> int:
+    session = None
+    if pergunta != None:
+        titulo = llm.chain_titulo(pergunta)
+        session = ChatSession(titulo=titulo)
+        session.save()
+        return session.session_id
+    else:
+        session = ChatSession()
+        session.save()
+        return session.session_id
 
-def saveSessao(pergunta: str, session_id: int):
+def save_sessao(pergunta: str, session_id: int):
     session = None
     session = ChatSession.select().where(ChatSession.session_id == session_id)
     if session == None:
@@ -14,7 +26,7 @@ def saveSessao(pergunta: str, session_id: int):
     else:
         pass
 
-def deleteSessao(session_id: int)-> str:
+def delete_sessao(session_id: int)-> str:
     session = ChatSession.select().where(ChatSession.session_id == session_id).first()
     if session == None:
         return "Sessão não encontrada"
@@ -22,7 +34,7 @@ def deleteSessao(session_id: int)-> str:
         ChatSession.delete().where(ChatSession.session_id == session_id).execute()
         return "Sessão deletada"
 
-def listSessao(session_id: int = None)-> List[ChatSession]:
+def list_sessao(session_id: int = None)-> List[ChatSession]:
     sessions = None
     array = []
     if session_id == None:

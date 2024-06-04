@@ -2,7 +2,7 @@ from fastapi import Body, FastAPI, UploadFile, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from llm.llm import chain, chain_with_history, chain_piada, chain_retriever, chain_retriever_with_history, chain_retriever_with_history_title
 from controllers.DocumentsController import save_document, delete_document, list_documents
-from controllers.ChatSessionController import deleteSessao, listSessao
+from controllers.ChatSessionController import delete_sessao, create_sessao, save_sessao, list_sessao
 from controllers.ChatHistoryController import getChatMessasgeHistoryBySession
 from controllers.UserController import create_user, login, delete_user
 from typing import List, Annotated, Optional
@@ -106,10 +106,15 @@ def deleta_documento_api(documento_id: int):
 
 
 # APIS de controle de Chats
+@app.post("/createSessionID/", tags=["Chat"])
+def postSession(pergunta: str = None):
+    session_id = create_sessao(pergunta)
+    return{"retorno": "Sessão criada - " + str(session_id)}
+
 @app.get("/listSession/{session_id}", tags=["Chat"])
 def get_sessao_api(session_id: int = None)-> SessaoObj | None:
     ret: Optional[SessaoObj] = None
-    sessoes = listSessao(session_id)
+    sessoes = list_sessao(session_id)
     if len(sessoes) == 0:
         return None
     for sessao in sessoes:
@@ -128,7 +133,7 @@ def lista_historico_api(session_id: int)-> HistoricoObj | None:
 
 @app.delete("/deleteSession/{session_id}", tags=["Chat"])
 def deleta_sessao_api(session_id: int):
-    deleteSessao(session_id)
+    delete_sessao(session_id)
     return {"retorno": "Sessão Deletada"}
 
 # APIS de controle de Usuários

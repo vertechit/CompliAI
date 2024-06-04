@@ -12,7 +12,7 @@ class ChatSession(peewee.Model):
     Classe que representa o id das sessões
     """
     session_id = peewee.AutoField(primary_key=True)
-    titulo = peewee.CharField(max_length=3000)
+    titulo = peewee.CharField(max_length=3000, null=True)
     criado = peewee.DateTimeField(default= datetime.now)
     class Meta:
         database = db
