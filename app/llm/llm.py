@@ -5,7 +5,7 @@ from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from operator import itemgetter
 from controllers.ChatHistoryController import getChatMessasgeHistoryBySession, insertHistory
-from controllers.ChatSessionController import saveSessao
+from controllers.ChatSessionController import save_sessao
 from vectors.vectorStore import getRetriever
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 
@@ -150,5 +150,5 @@ def chain_retriever_with_sources(input: str)-> dict:
     return ret
 
 def chain_retriever_with_history_title(input: str, sessionId: int)-> str:
-    saveSessao(pergunta=input, session_id=sessionId)
+    save_sessao(pergunta=input, session_id=sessionId)
     return chain_retriever_with_history(input, sessionId)
