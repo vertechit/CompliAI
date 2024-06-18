@@ -119,10 +119,6 @@ import { ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import {
   Bars3Icon,
-  CalendarIcon,
-  ChartPieIcon,
-  DocumentDuplicateIcon,
-  FolderIcon,
   DocumentTextIcon,
   XMarkIcon,
   ChatBubbleOvalLeftEllipsisIcon
@@ -131,9 +127,6 @@ import {
 const navigation = ref([
   { name: 'Chat', href: '/', icon: ChatBubbleOvalLeftEllipsisIcon, current: false },
   { name: 'Documentos', href: '/documentos', icon: DocumentTextIcon, current: false },
- // { name: 'Projects', href: '#', icon: FolderIcon, current: false },
- // { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },
- // { name: 'Documents', href: '#', icon: DocumentDuplicateIcon, current: false },
  // { name: 'Reports', href: '#', icon: ChartPieIcon, current: false },
 ])
 const teams = ref([
