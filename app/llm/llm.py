@@ -4,10 +4,11 @@ from langchain_openai import ChatOpenAI
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from operator import itemgetter
-from controllers.ChatHistoryController import getChatMessasgeHistoryBySession, insertHistory
+from controllers.ChatHistoryController import get_chat_messasge_history_by_session, insert_history
 from controllers.ChatSessionController import save_sessao
 from vectors.vectorStore import getRetriever
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
+from langchain_core.runnables.utils import ConfigurableFieldSpec
 
 model = ChatOpenAI(model="gpt-3.5-turbo")
 
@@ -60,7 +61,7 @@ def chain_titulo(input: str) -> str:
     template =[
         (
             "system",
-            "Baseado na mensagem a seguir monte um titulo bem simplificado sobre a intenção da mensagem, mostre apenas o titulo"
+            "Baseado na mensagem a seguir monte um titulo bem simplificado sobre a intenção da mensagem, mostre apenas o titulo, sem aspas"
         ),
         (
             "human",
@@ -77,8 +78,8 @@ def chain(input: str) -> str:
     return chain_run.invoke({"assunto":input})
 
 
-def chain_with_history(input: str, sessionId: int) -> str:
-    insertHistory(sessionId=sessionId, mensagem=input, tipo=1)
+def chain_with_history(input: str, sessionId: int, user_id: int) -> str:
+    insert_history(sessionId=sessionId, mensagem=input, tipo=1)
     prompt = ChatPromptTemplate.from_messages(_template_history_question)
     chain = ( 
             prompt
@@ -88,12 +89,35 @@ def chain_with_history(input: str, sessionId: int) -> str:
 
     with_message_history = RunnableWithMessageHistory(
         chain,
-        getChatMessasgeHistoryBySession,
+        get_chat_messasge_history_by_session,
         input_messages_key="question",
         history_messages_key="history",
+        history_factory_config=[
+                ConfigurableFieldSpec(
+                    id="session_id",
+                    annotation=str,
+                    name="Session ID",
+                    description="Unique identifier for a session.",
+                    default="",
+                    is_shared=True,
+                ),
+                ConfigurableFieldSpec(
+                    id="user_id",
+                    annotation=str,
+                    name="User ID",
+                    description="Unique identifier for a user.",
+                    default="",
+                    is_shared=True,
+                )
+            ]
     )
-    ret = with_message_history.invoke({"question":input},config={"configurable": {"session_id": sessionId}})
-    insertHistory(sessionId=sessionId, mensagem=ret, tipo=2)
+    ret = with_message_history.invoke(
+        {"question":input},
+        config={"configurable": {
+            "session_id": sessionId,
+            "user_id": user_id
+            }})
+    insert_history(sessionId=sessionId, mensagem=ret, tipo=2)
     return ret
 
 def chain_retriever(input: str)->str:
@@ -109,7 +133,7 @@ def chain_retriever(input: str)->str:
     return ret
 
 def chain_retriever_with_history(input: str, sessionId: int)-> str:
-    insertHistory(sessionId=sessionId, mensagem=input, tipo=1)
+    insert_history(sessionId=sessionId, mensagem=input, tipo=1)
     prompt = ChatPromptTemplate.from_messages(__template_history_question_and_context)
     context_chain = itemgetter("question") | getRetriever() 
     first_step = RunnablePassthrough.assign(context=context_chain)
@@ -121,7 +145,7 @@ def chain_retriever_with_history(input: str, sessionId: int)-> str:
     )
     with_message_history = RunnableWithMessageHistory(
         chain,
-        getChatMessasgeHistoryBySession,
+        get_chat_messasge_history_by_session,
         input_messages_key="question",
         history_messages_key="history",
     )
@@ -129,7 +153,7 @@ def chain_retriever_with_history(input: str, sessionId: int)-> str:
         {"context": getRetriever(), "question":input},
         config={"configurable": {"session_id": sessionId}},
         )
-    insertHistory(sessionId=sessionId, mensagem=ret, tipo=2)
+    insert_history(sessionId=sessionId, mensagem=ret, tipo=2)
     return ret
 
 def chain_retriever_with_sources(input: str)-> dict:

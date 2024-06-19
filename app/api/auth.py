@@ -1,5 +1,8 @@
 from pydantic import BaseModel
 from datetime import datetime, timedelta, timezone
+from fastapi import HTTPException, Depends, status
+from fastapi.security import OAuth2PasswordBearer
+from jwt.exceptions import InvalidTokenError
 import jwt
 
 # to get a string like this run:
@@ -15,6 +18,9 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: str | None = None
+    user_id: int | None = None
+   
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
     
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
@@ -25,3 +31,36 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
+def get_current_user(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        user_id: int = payload.get("user_id")
+        if username is None:
+            raise credentials_exception
+        token_data = TokenData(username=username, user_id=user_id)
+    except InvalidTokenError:
+        raise credentials_exception
+    user = {"username": token_data.username, "user_id": token_data.user_id}
+    if user is None:
+        raise credentials_exception
+    return user
+
+def validade_admin_user(user: dict = Depends(get_current_user)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Not ADMIN access",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        if user['username'] != 'admin':
+            raise credentials_exception
+    except InvalidTokenError:
+        raise credentials_exception
+    return user
