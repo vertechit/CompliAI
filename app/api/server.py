@@ -8,7 +8,7 @@ from controllers.UserController import create_user, login, delete_user
 from typing import List, Annotated, Optional
 from api.models import InputPergunta, InputChat, ChunkObj, InputDocumentoApi, DocumentoObj, ResponseChat, SessaoObj, HistoricoObj, InputUser, InputUsername
 from utils.utils import destroyDatabases, initDatabases
-from api.auth import create_access_token, Token, ACCESS_TOKEN_EXPIRE_MINUTES, validade_admin_user, get_current_user
+from api.auth import CurrentUser, create_access_token, Token, ACCESS_TOKEN_EXPIRE_MINUTES, validade_admin_user, get_current_user
 from datetime import timedelta
 
 tags_metadata = [
@@ -24,49 +24,49 @@ initDatabases()
 app = FastAPI(openapi_tags=tags_metadata)
 
 @app.get("/items/")
-async def read_items(current_user: Annotated[str, Depends(get_current_user)]):
+async def read_items(current_user: Annotated[CurrentUser, Depends(get_current_user)]):
     return {"current_user": current_user}
 
 # APIS de LLMS
 @app.post("/piada", tags=["LLMs"])
-def llm_piada_api(current_user: Annotated[str, Depends(get_current_user)], mensagem=Body()):
+def llm_piada_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], mensagem=Body()):
     return {"retorno": chain_piada(mensagem)}
 
 @app.post("/chain", tags=["LLMs"])
-def llm_chain_api(current_user: Annotated[str, Depends(get_current_user)], chat: InputChat)-> ResponseChat:
+def llm_chain_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], chat: InputChat)-> ResponseChat:
     ret = chain(chat.HumamMessage)
     response = ResponseChat(AiMessage=ret)
     return response
 
 @app.post("/chainHistory/{session_id}", tags=["LLMs"])
-def llm_chain_history_api(current_user: Annotated[str, Depends(get_current_user)], session_id: int, chat: InputChat)-> ResponseChat:
-    ret = chain_with_history(chat.HumamMessage, session_id, current_user["user_id"])
+def llm_chain_history_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], session_id: int, chat: InputChat)-> ResponseChat:
+    ret = chain_with_history(chat.HumamMessage, session_id, current_user.user_id)
     response = ResponseChat(AiMessage=ret)
     return response
 
 @app.post("/chain_retriever", tags=["LLMs"])
-def llm_chain_retriever_api(current_user: Annotated[str, Depends(get_current_user)], chat: InputChat)-> ResponseChat:
+def llm_chain_retriever_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], chat: InputChat)-> ResponseChat:
     ret = chain_retriever(chat.HumamMessage)
     response = ResponseChat(AiMessage=ret)
     return response
 
 @app.post("/chain_retrieverHistory/{session_id}", tags=["LLMs"])
-def llm_chain_retriever_hist_api(current_user: Annotated[str, Depends(get_current_user)], session_id: int, chat: InputChat)-> ResponseChat:
+def llm_chain_retriever_hist_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], session_id: int, chat: InputChat)-> ResponseChat:
     ret = chain_retriever_with_history(chat.HumamMessage, session_id)
     response = ResponseChat(AiMessage=ret)
     return response
 
 @app.post("/chain_retrieverHistoryTitle/{session_id}", tags=["LLMs"])
-def llm_chain_retriever_hist_title_api(current_user: Annotated[str, Depends(get_current_user)], session_id: int, chat: InputChat)-> ResponseChat:
-    ret = chain_retriever_with_history_title(chat.HumamMessage, session_id)
+def llm_chain_retriever_hist_title_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], session_id: int, chat: InputChat)-> ResponseChat:
+    ret = chain_retriever_with_history_title(chat.HumamMessage, session_id, current_user.user_id)
     response = ResponseChat(AiMessage=ret)
     return response
 
 # APIS de Documentos
 @app.get("/listDocument", tags=["Documentos"])
-def lista_documentos_api(current_user: Annotated[str, Depends(get_current_user)])-> List[DocumentoObj] | None:
+def lista_documentos_api(current_user: Annotated[CurrentUser, Depends(get_current_user)])-> List[DocumentoObj] | None:
     ret: List[DocumentoObj] = []
-    documentos = list_documents(0, current_user["user_id"])
+    documentos = list_documents(0, current_user.user_id)
     if len(documentos) == 0:
         return None
     for doc in documentos:
@@ -75,9 +75,9 @@ def lista_documentos_api(current_user: Annotated[str, Depends(get_current_user)]
     return ret
 
 @app.get("/listDocument/{documento_id}", tags=["Documentos"])
-def lista_documento_api(current_user: Annotated[str, Depends(get_current_user)], documento_id: int = None)-> DocumentoObj | None:
+def lista_documento_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], documento_id: int = None)-> DocumentoObj | None:
     ret: Optional[DocumentoObj] = None
-    documentos = list_documents(documento_id, current_user["user_id"])
+    documentos = list_documents(documento_id, current_user.user_id)
     if len(documentos) == 0:
         return None
     for doc in documentos:
@@ -86,36 +86,36 @@ def lista_documento_api(current_user: Annotated[str, Depends(get_current_user)],
     return ret
 
 @app.post("/createDocument/", tags=["Documentos"])
-async def upload_file_api(current_user: Annotated[str, Depends(get_current_user)], description: str, file: UploadFile):
+async def upload_file_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], description: str, file: UploadFile):
     contents = await file.read()
-    documento = save_document(contents, file.filename, description, current_user["user_id"])
+    documento = save_document(contents, file.filename, description, current_user.user_id)
     return {"retorno": documento}
 
 @app.post("/createDocumentUrl/", tags=["Documentos"])
-def upload_file_url_api(current_user: Annotated[str, Depends(get_current_user)], documento: InputDocumentoApi):
-    documento = save_document(documento.url, documento.titulo, documento.description, current_user["user_id"])
+def upload_file_url_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], documento: InputDocumentoApi):
+    documento = save_document(documento.url, documento.titulo, documento.description, current_user.user_id)
     return {"retorno": documento}
 
 @app.delete("/deleteDocument/{documento_id}", tags=["Documentos"])
-def deleta_documento_api(current_user: Annotated[str, Depends(get_current_user)], documento_id: int):
-    delete_document(documento_id, current_user["user_id"])
+def deleta_documento_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], documento_id: int):
+    delete_document(documento_id, current_user.user_id)
     return {"retorno": "Deletado"}
 
 
 # APIS de controle de Chats
 @app.post("/createSession/", tags=["Chat"])
-def create_session_api(current_user: Annotated[str, Depends(get_current_user)], pergunta: InputPergunta = None) -> ResponseChat: 
-    session_id = create_sessao(pergunta, current_user["user_id"])
+def create_session_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], pergunta: InputPergunta = None) -> ResponseChat: 
+    session_id = create_sessao(pergunta, current_user.user_id)
     response = ResponseChat(AiMessage="")
     if pergunta != None:
-        ret = chain_with_history(pergunta.Pergunta, session_id, current_user["user_id"])
+        ret = chain_with_history(pergunta.Pergunta, session_id, current_user.user_id)
         response = ResponseChat(AiMessage=ret)
     return response
 
 @app.get("/listSession", tags=["Chat"])
-def get_sessao_api(current_user: Annotated[str, Depends(get_current_user)])-> List[SessaoObj] | None:
+def get_sessao_api(current_user: Annotated[CurrentUser, Depends(get_current_user)])-> List[SessaoObj] | None:
     ret: List[SessaoObj] = []
-    sessoes = list_sessao(0, current_user["user_id"])
+    sessoes = list_sessao(0, current_user.user_id)
     if len(sessoes) == 0:
         return None
     for sessao in sessoes:
@@ -123,9 +123,9 @@ def get_sessao_api(current_user: Annotated[str, Depends(get_current_user)])-> Li
     return ret
 
 @app.get("/listSession/{session_id}", tags=["Chat"])
-def get_sessao_api(current_user: Annotated[str, Depends(get_current_user)], session_id: int = None)-> SessaoObj | None:
+def get_sessao_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], session_id: int = None)-> SessaoObj | None:
     ret: Optional[SessaoObj] = None
-    sessoes = list_sessao(session_id, current_user["user_id"])
+    sessoes = list_sessao(session_id, current_user.user_id)
     if len(sessoes) == 0:
         return None
     for sessao in sessoes:
@@ -133,9 +133,9 @@ def get_sessao_api(current_user: Annotated[str, Depends(get_current_user)], sess
     return ret
 
 @app.get("/listHistory/{session_id}", tags=["Chat"])
-def lista_historico_api(current_user: Annotated[str, Depends(get_current_user)], session_id: int)-> List[HistoricoObj] | None:
+def lista_historico_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], session_id: int)-> List[HistoricoObj] | None:
     ret: Optional[HistoricoObj] = []
-    historicos = get_chat_history_by_session(session_id, current_user["user_id"])
+    historicos = get_chat_history_by_session(session_id, current_user.user_id)
     if historicos == None:
         return None
     for historico in historicos:
@@ -143,8 +143,8 @@ def lista_historico_api(current_user: Annotated[str, Depends(get_current_user)],
     return ret
 
 @app.delete("/deleteSession/{session_id}", tags=["Chat"])
-def deleta_sessao_api(current_user: Annotated[str, Depends(get_current_user)], session_id: int):
-    sessao = delete_sessao(session_id, current_user["user_id"])
+def deleta_sessao_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], session_id: int):
+    sessao = delete_sessao(session_id, current_user.user_id)
     return {"retorno": sessao}
 
 # APIS de controle de Usuários

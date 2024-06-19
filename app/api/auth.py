@@ -19,6 +19,10 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: str | None = None
     user_id: int | None = None
+    
+class CurrentUser(BaseModel):
+    username: str
+    user_id: int
    
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
     
@@ -32,7 +36,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
+def get_current_user(token: str = Depends(oauth2_scheme))->CurrentUser:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -47,19 +51,19 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         token_data = TokenData(username=username, user_id=user_id)
     except InvalidTokenError:
         raise credentials_exception
-    user = {"username": token_data.username, "user_id": token_data.user_id}
+    user = CurrentUser(username=token_data.username, user_id= token_data.user_id)
     if user is None:
         raise credentials_exception
     return user
 
-def validade_admin_user(user: dict = Depends(get_current_user)):
+def validade_admin_user(user: CurrentUser = Depends(get_current_user)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Not ADMIN access",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        if user['username'] != 'admin':
+        if user.username != 'admin':
             raise credentials_exception
     except InvalidTokenError:
         raise credentials_exception

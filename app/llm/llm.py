@@ -173,6 +173,6 @@ def chain_retriever_with_sources(input: str)-> dict:
     ret = abc.invoke(input)
     return ret
 
-def chain_retriever_with_history_title(input: str, sessionId: int)-> str:
-    save_sessao(pergunta=input, session_id=sessionId)
+def chain_retriever_with_history_title(input: str, sessionId: int, user_id: int)-> str:
+    save_sessao(pergunta=input, session_id=sessionId, user_id=user_id)
     return chain_retriever_with_history(input, sessionId)
