@@ -2,13 +2,13 @@ from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from models.ChatHistory import ChatHistory, ChatSession
-from typing import List
+from typing import List, Union
 
-def insert_history(sessionId: int, mensagem: str, tipo: int):
-    hist = ChatHistory(session_id=sessionId, mensagem=mensagem, tipo=tipo)
+def insert_history(session_id: int, mensagem: str, tipo: int):
+    hist = ChatHistory(session_id=session_id, mensagem=mensagem, tipo=tipo)
     hist.save()
 
-def get_chat_history_by_session(session_id: int, user_id: int)->List[tuple]:
+def get_chat_history_by_session(session_id: int, user_id: int) -> Union[List[tuple], None]:
     ret = []
     for message in ChatHistory.select().join(ChatSession).where((ChatHistory.session_id==session_id) & (ChatSession.user_id==user_id)).order_by(ChatHistory.chathistory_id.desc()):
         ret.append((message.chathistory_id, message.session_id.session_id, message.mensagem, message.tipo, message.criado))

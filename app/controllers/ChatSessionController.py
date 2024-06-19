@@ -43,8 +43,8 @@ def list_sessao(session_id: int, user_id: int)-> List[ChatSession]:
     else:
         sessions = ChatSession.select().where((ChatSession.session_id == session_id) & (ChatSession.user_id == user_id))
     for session in sessions:
-        newSession = (session.session_id, session.titulo, session.criado, session.user_id)
-        array.append(newSession)
+        new_session = (session.session_id, session.titulo, session.criado, session.user_id)
+        array.append(new_session)
     return array
 
     

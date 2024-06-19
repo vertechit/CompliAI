@@ -134,7 +134,7 @@ def get_sessao_api(current_user: Annotated[CurrentUser, Depends(get_current_user
 
 @app.get("/listHistory/{session_id}", tags=["Chat"])
 def lista_historico_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], session_id: int)-> List[HistoricoObj] | None:
-    ret: Optional[HistoricoObj] = []
+    ret: List[HistoricoObj] = []
     historicos = get_chat_history_by_session(session_id, current_user.user_id)
     if historicos == None:
         return None

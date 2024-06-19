@@ -52,8 +52,6 @@ def get_current_user(token: str = Depends(oauth2_scheme))->CurrentUser:
     except InvalidTokenError:
         raise credentials_exception
     user = CurrentUser(username=token_data.username, user_id= token_data.user_id)
-    if user is None:
-        raise credentials_exception
     return user
 
 def validade_admin_user(user: CurrentUser = Depends(get_current_user)):

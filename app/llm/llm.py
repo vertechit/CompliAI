@@ -78,8 +78,8 @@ def chain(input: str) -> str:
     return chain_run.invoke({"assunto":input})
 
 
-def chain_with_history(input: str, sessionId: int, user_id: int) -> str:
-    insert_history(sessionId=sessionId, mensagem=input, tipo=1)
+def chain_with_history(input: str, session_id: int, user_id: int) -> str:
+    insert_history(session_id=session_id, mensagem=input, tipo=1)
     prompt = ChatPromptTemplate.from_messages(_template_history_question)
     chain = ( 
             prompt
@@ -114,10 +114,10 @@ def chain_with_history(input: str, sessionId: int, user_id: int) -> str:
     ret = with_message_history.invoke(
         {"question":input},
         config={"configurable": {
-            "session_id": sessionId,
+            "session_id": session_id,
             "user_id": user_id
             }})
-    insert_history(sessionId=sessionId, mensagem=ret, tipo=2)
+    insert_history(session_id=session_id, mensagem=ret, tipo=2)
     return ret
 
 def chain_retriever(input: str)->str:
@@ -132,8 +132,8 @@ def chain_retriever(input: str)->str:
     ret = chain.invoke(input)
     return ret
 
-def chain_retriever_with_history(input: str, sessionId: int)-> str:
-    insert_history(sessionId=sessionId, mensagem=input, tipo=1)
+def chain_retriever_with_history(input: str, session_id: int)-> str:
+    insert_history(session_id=session_id, mensagem=input, tipo=1)
     prompt = ChatPromptTemplate.from_messages(__template_history_question_and_context)
     context_chain = itemgetter("question") | getRetriever() 
     first_step = RunnablePassthrough.assign(context=context_chain)
@@ -151,9 +151,9 @@ def chain_retriever_with_history(input: str, sessionId: int)-> str:
     )
     ret = with_message_history.invoke(
         {"context": getRetriever(), "question":input},
-        config={"configurable": {"session_id": sessionId}},
+        config={"configurable": {"session_id": session_id}},
         )
-    insert_history(sessionId=sessionId, mensagem=ret, tipo=2)
+    insert_history(session_id=session_id, mensagem=ret, tipo=2)
     return ret
 
 def chain_retriever_with_sources(input: str)-> dict:
@@ -173,6 +173,6 @@ def chain_retriever_with_sources(input: str)-> dict:
     ret = abc.invoke(input)
     return ret
 
-def chain_retriever_with_history_title(input: str, sessionId: int, user_id: int)-> str:
-    save_sessao(pergunta=input, session_id=sessionId, user_id=user_id)
-    return chain_retriever_with_history(input, sessionId)
+def chain_retriever_with_history_title(input: str, session_id: int, user_id: int)-> str:
+    save_sessao(pergunta=input, session_id=session_id, user_id=user_id)
+    return chain_retriever_with_history(input, session_id)
