@@ -1,48 +1,28 @@
-try:
-    import sys
-    import os
-    
-    sys.path.append(
-        os.path.abspath(
-            os.path.join(
-                os.path.dirname(__file__),
-                '..'
-            )
-        )
-    )
-
-except:
-    raise
-
-import pytest
 from fastapi.testclient import TestClient
 from api import server
-from utils.utils import destroyDatabases, initDatabases
-import os
 import logging
-from dotenv import load_dotenv
 
 LOGGER = logging.getLogger(__name__)
 client = TestClient(server.app)
 
-@pytest.fixture
-def test_start_database():
-    load_dotenv()
-    if 'POSTGRES_HOST' in os.environ:
-        del os.environ["POSTGRES_HOST"]
-    if 'VECTORDB' in os.environ:
-        del os.environ["VECTORDB"]
-    os.environ["RECREATE_DB"] = "1"
-    destroyDatabases()
-    initDatabases()
+def get_bearer_token(user: str | None = None, password: str | None = None):
+    response = client.post(
+        "/token",
+        data={"username": user if user != None else "admin", "password": password if password != None else "admin"}
+    )
+    assert response.status_code == 200
+    assert 'access_token' in response.json()
+    assert 'token_type' in response.json()
+    return response.json()["access_token"]
 
 def test_delete_usuario_inexistente():
     """
-    Deleta um usuário
+    Tenta deletar um usuário inexistente
     """
     response = client.post(
         "/deleteUsers",
-        json={"username":"teste@teste.com"}
+        json={"username":"teste@teste.com"},
+        headers={"Authorization": f"Bearer {get_bearer_token()}"}
     )
     assert response.status_code == 200
     assert response.json() == {'usuario_id': 0}
@@ -51,12 +31,14 @@ def test_cria_usuario():
     """
     Cria um usuário
     """
+    token = get_bearer_token()
     response = client.post(
         "/createUsers",
-        json={"username":"teste@teste.com", "password":"teste"}
+        json={"username":"teste@teste.com", "password":"teste"},
+        headers={"Authorization": f"Bearer {token}"}
     )
     assert response.status_code == 200
-    assert response.json() == {'login': 'teste@teste.com', 'tipo': 0, 'user_id': 1}
+    assert response.json() == {'login': 'teste@teste.com', 'tipo': 0, 'user_id': 2}
     
 def test_login_com_sucesso():
     """
@@ -80,13 +62,39 @@ def test_login_com_erro():
     )
     assert response.status_code == 404
     
+def test_cria_usuario_sem_ser_admin():
+    """
+    Tenta criar um usuário sem ser um usuário ADMIN
+    """
+    token = get_bearer_token("teste@teste.com", "teste")
+    response = client.post(
+        "/createUsers",
+        json={"username":"teste2@teste.com", "password":"teste2"},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 401
+    
+def test_deleta_usuario_sem_ser_admin():
+    """
+    Tenta deletar um usuário sem ser um usuário ADMIN
+    """
+    token = get_bearer_token("teste@teste.com", "teste")
+    response = client.post(
+        "/deleteUsers",
+        json={"username":"teste@teste.com"},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 401
+    
 def test_delete_usuario_existente():
     """
     Deleta um usuário
     """
+    token = get_bearer_token()
     response = client.post(
         "/deleteUsers",
-        json={"username":"teste@teste.com"}
+        json={"username":"teste@teste.com"},
+        headers={"Authorization": f"Bearer {token}"}
     )
     assert response.status_code == 200
     assert response.json() == {'usuario_id': 1}

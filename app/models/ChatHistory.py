@@ -1,6 +1,7 @@
 import peewee
 import os
 from datetime import datetime
+from models.User import User
 
 db = peewee.SqliteDatabase('example.db')
 
@@ -14,6 +15,7 @@ class ChatSession(peewee.Model):
     session_id = peewee.AutoField(primary_key=True)
     titulo = peewee.CharField(max_length=3000, null=True)
     criado = peewee.DateTimeField(default= datetime.now)
+    user_id = peewee.ForeignKeyField(User, backref='user')
     class Meta:
         database = db
 
@@ -25,5 +27,6 @@ class ChatHistory(peewee.Model):
     session_id = peewee.ForeignKeyField(ChatSession, backref='history')
     mensagem = peewee.CharField()
     tipo = peewee.IntegerField(constraints=[peewee.Check('tipo in (0,1,2)')]) # 0 = SystemMessage / 1 = HumamMessage / 2 = AiMessage
+    criado = peewee.DateTimeField(default= datetime.now)
     class Meta:
         database = db

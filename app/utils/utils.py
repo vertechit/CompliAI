@@ -8,6 +8,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.documents.base import Document
 from typing import List
 from models import ChatHistory, Documentos, User
+from controllers import UserController
 from vectors import vectorStore
 from bs4 import SoupStrainer
 
@@ -30,6 +31,7 @@ def initDatabases():
     vectorStore.createCollection()
     if not User.User.table_exists():
         User.User.create_table()
+        UserController.create_user('admin', 'admin')
     if not ChatHistory.ChatSession.table_exists():
         ChatHistory.ChatSession.create_table()
     if not ChatHistory.ChatHistory.table_exists():
