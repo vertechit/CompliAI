@@ -10,6 +10,7 @@ from api.models import InputPergunta, InputChat, ChunkObj, InputDocumentoApi, Do
 from utils.utils import destroyDatabases, initDatabases
 from api.auth import CurrentUser, create_access_token, Token, ACCESS_TOKEN_EXPIRE_MINUTES, validade_admin_user, get_current_user
 from datetime import timedelta
+from agents.agent import graph
 
 tags_metadata = [
     {"name": "LLMs", "description": "Chamadas para as LLMs"},
@@ -60,6 +61,17 @@ def llm_chain_retriever_hist_api(current_user: Annotated[CurrentUser, Depends(ge
 def llm_chain_retriever_hist_title_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], session_id: int, chat: InputChat)-> ResponseChat:
     ret = chain_retriever_with_history_title(chat.HumamMessage, session_id, current_user.user_id)
     response = ResponseChat(AiMessage=ret)
+    return response
+
+@app.post("/graph/{session_id}", tags=["LLMs"])
+def graph_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], session_id: int, chat: InputChat)-> ResponseChat:
+    ret = graph.invoke({
+        "messages": [
+            ("user", chat.HumamMessage),
+            ]
+        })
+    print(ret)
+    response = ResponseChat(AiMessage=ret['messages'][-1].content)
     return response
 
 # APIS de Documentos
