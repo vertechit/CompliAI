@@ -19,3 +19,4 @@ python-multipart==0.0.9
 langchain-chroma==0.1.1
 pyjwt==2.8.0
 langgraph==0.1.1
+grandalf==0.8
