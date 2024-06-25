@@ -4,19 +4,19 @@ from typing import List
 from llm import llm
 from peewee import fn
 
-def create_sessao(pergunta: str, user_id: int) -> ChatSession:
+def create_sessao(pergunta: str, user_id: int) -> tuple[ChatSession]:
     session = None
     if pergunta != None:
         titulo = llm.chain_titulo(pergunta)
         session = ChatSession(titulo=titulo, user_id=user_id)
         session.save()
-        sessionRet = (session.session_id, session.titulo, session.criado, session.user_id)
-        return sessionRet
+        session_ret = (session.session_id, session.titulo, session.criado, session.user_id)
+        return session_ret
     else:
         session = ChatSession(user_id=user_id)
         session.save()
-        sessionRet = (session.session_id, session.titulo, session.criado, session.user_id)
-        return sessionRet
+        session_ret = (session.session_id, session.titulo, session.criado, session.user_id)
+        return session_ret
 
 def save_sessao(pergunta: str, session_id: int, user_id: int):
     session = None
