@@ -10,6 +10,7 @@ from api.models import InputPergunta, InputChat, ChunkObj, InputDocumentoApi, Do
 from utils.utils import destroyDatabases, initDatabases
 from api.auth import CurrentUser, create_access_token, Token, ACCESS_TOKEN_EXPIRE_MINUTES, validade_admin_user, get_current_user
 from datetime import timedelta
+from agents.agent import graph
 
 tags_metadata = [
     {"name": "LLMs", "description": "Chamadas para as LLMs"},
@@ -62,6 +63,17 @@ def llm_chain_retriever_hist_title_api(current_user: Annotated[CurrentUser, Depe
     response = ResponseChat(AiMessage=ret)
     return response
 
+@app.post("/graph/{session_id}", tags=["LLMs"])
+def graph_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], session_id: int, chat: InputChat)-> ResponseChat:
+    ret = graph.invoke({
+        "messages": [
+            ("user", chat.HumamMessage),
+            ]
+        })
+    print(ret)
+    response = ResponseChat(AiMessage=ret['messages'][-1].content)
+    return response
+
 # APIS de Documentos
 @app.get("/listDocument", tags=["Documentos"])
 def lista_documentos_api(current_user: Annotated[CurrentUser, Depends(get_current_user)])-> List[DocumentoObj] | None:
@@ -104,12 +116,12 @@ def deleta_documento_api(current_user: Annotated[CurrentUser, Depends(get_curren
 
 # APIS de controle de Chats
 @app.post("/createSession/", tags=["Chat"])
-def create_session_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], pergunta: InputPergunta = None) -> ResponseChat: 
-    session_id = create_sessao(pergunta, current_user.user_id)
-    response = ResponseChat(AiMessage="")
+def create_session_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], pergunta: InputPergunta = None) -> SessaoObj: 
+    sessao = create_sessao(pergunta, current_user.user_id)
+    print(sessao)
+    response = SessaoObj(session_id=sessao[0], titulo=sessao[1], criado=sessao[2], user_id=sessao[3].user_id)
     if pergunta != None:
-        ret = chain_with_history(pergunta.Pergunta, session_id, current_user.user_id)
-        response = ResponseChat(AiMessage=ret)
+        chain_with_history(pergunta.Pergunta, sessao[0], current_user.user_id)
     return response
 
 @app.get("/listSession", tags=["Chat"])

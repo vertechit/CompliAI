@@ -25,7 +25,10 @@ def test_cria_sessao_sem_titulo():
         headers={"Authorization": f"Bearer {get_bearer_token()}"}
     )
     assert response.status_code == 200
-    assert response.json() == {'AiMessage': ''}
+    assert isinstance(response.json()['criado'], str)
+    assert response.json()['session_id'] == 1
+    assert response.json()['titulo'] == None
+    assert response.json()['user_id'] == 1
     
 def test_lista_sessoes_sem_titulo():
     """
@@ -81,7 +84,10 @@ def test_cria_sessao_com_titulo():
         headers={"Authorization": f"Bearer {get_bearer_token()}"}
     )
     assert response.status_code == 200
-    assert isinstance(response.json()['AiMessage'], str)
+    assert isinstance(response.json()['criado'], str)
+    assert response.json()['session_id'] == 1
+    assert isinstance(response.json()['titulo'], str)
+    assert response.json()['user_id'] == 1
     
 def test_lista_sessoes_com_titulo():
     """
