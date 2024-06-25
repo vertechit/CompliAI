@@ -116,12 +116,12 @@ def deleta_documento_api(current_user: Annotated[CurrentUser, Depends(get_curren
 
 # APIS de controle de Chats
 @app.post("/createSession/", tags=["Chat"])
-def create_session_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], pergunta: InputPergunta = None) -> ResponseChat: 
-    session_id = create_sessao(pergunta, current_user.user_id)
-    response = ResponseChat(AiMessage="")
+def create_session_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], pergunta: InputPergunta = None) -> SessaoObj: 
+    sessao = create_sessao(pergunta, current_user.user_id)
+    print(sessao)
+    response = SessaoObj(session_id=sessao[0], titulo=sessao[1], criado=sessao[2], user_id=sessao[3].user_id)
     if pergunta != None:
-        ret = chain_with_history(pergunta.Pergunta, session_id, current_user.user_id)
-        response = ResponseChat(AiMessage=ret)
+        chain_with_history(pergunta.Pergunta, sessao[0], current_user.user_id)
     return response
 
 @app.get("/listSession", tags=["Chat"])
