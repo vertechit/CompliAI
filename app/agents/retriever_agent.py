@@ -163,5 +163,5 @@ def generate(state):
     return {"messages": [response]}
 
 
-print("*" * 20 + "Prompt[rlm/rag-prompt]" + "*" * 20)
-prompt = hub.pull("rlm/rag-prompt").pretty_print()  # Show what the prompt looks like
+# print("*" * 20 + "Prompt[rlm/rag-prompt]" + "*" * 20)
+# prompt = hub.pull("rlm/rag-prompt").pretty_print()  # Show what the prompt looks like

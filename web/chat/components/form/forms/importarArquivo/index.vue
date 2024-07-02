@@ -20,10 +20,12 @@
 
 <script setup lang="ts">
 import FormComponentesInputUpload from '@/components/form/componentes/inputUpload.vue'
-import {useNotificationStore} from '@/stores/notification'
+import {useNotificationStore} from '~/stores/notification'
 import {defaultStore} from '@/stores/default'
+import {authStore} from '@/stores/auth'
 const notificationStore = useNotificationStore()
 const defaultStorePinia = defaultStore()
+const auth = authStore()
 const emit = defineEmits(['close'])
 const props = defineProps({
     clearForm: Boolean,
@@ -47,8 +49,12 @@ watch(() => props.submitForm, async() => {
         const formData = new FormData()
         formData.append('file', form.value.files[0]);
         formData.append('description', form.value.description);
+        const token = auth.token
         await $fetch('/api/documents/create', {
             method: 'POST',
+            headers: {
+                "Authorization" :"bearer "+token
+            },
             body: formData
         })
         notificationStore.successNotification(null,'Arquivo enviado com sucesso')

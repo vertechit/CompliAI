@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import { Documents } from '@/models/Documents/List'
+import { type Documents } from '@/models/Documents/List'
 import { TrashIcon } from '@heroicons/vue/20/solid'
 import {defaultStore} from '@/stores/default'
 const defaultStorePinia = defaultStore()
@@ -52,11 +52,17 @@ const props = defineProps({
 })
 const isOpenModalDelete = ref(false)
 const listDocuments = ref<Documents[]>([])
+const auth = authStore()
 let currentElement = ref(0)
 const getList = async () => {
     try {
         setLoading(true)
-        const response = await $fetch('/api/documents/list') as Documents[]
+        const token = auth.token
+        const response = await $fetch('/api/documents/list',{
+            headers: {
+                "Authorization" :"bearer "+token
+            }
+        }) as Documents[]
         listDocuments.value = response
     } catch (error) {
         console.error(error)
@@ -72,8 +78,12 @@ const close = async () => {
 const deleteDocument = async (documentId: number) => {
     try {
         setLoading(true)
+        const token = auth.token
         await $fetch(`/api/documents/${documentId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                "Authorization" :"bearer "+token
+            }
         })
         await getList()
     } catch (error) {

@@ -26,20 +26,9 @@
                       <li>
                         <ul role="list" class="-mx-2 space-y-1">
                           <li v-for="item in navigation" :key="item.name">
-                            <a :href="item.href" :class="[item.current ? 'bg-blue-800 text-white' : 'text-white hover:text-white hover:bg-blue-800', 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold']">
+                            <a :href="item.href" :class="[item.href === route.path ? 'bg-blue-800 text-white' : 'text-white hover:text-white hover:bg-blue-800', 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold']">
                               <component :is="item.icon" class="h-6 w-6 shrink-0" aria-hidden="true" />
                               {{ item.name }}
-                            </a>
-                          </li>
-                        </ul>
-                      </li>
-                      <li>
-                        <div class="text-xs font-semibold leading-6 text-white">Your teams</div>
-                        <ul role="list" class="-mx-2 mt-2 space-y-1">
-                          <li v-for="team in teams" :key="team.name">
-                            <a :href="team.href" :class="[team.current ? 'bg-blue-800 text-white' : 'text-white hover:text-white hover:bg-blue-800', 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold']">
-                              <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-blue-700 bg-blue-800 text-[0.625rem] font-medium text-white group-hover:text-white">{{ team.initial }}</span>
-                              <span class="truncate">{{ team.name }}</span>
                             </a>
                           </li>
                         </ul>
@@ -63,7 +52,7 @@
               <li>
                 <ul role="list" class="-mx-2 space-y-1">
                   <li v-for="item in navigation" :key="item.name">
-                    <a :href="item.href" @click.prevent="setActive(item)" :class="[item.current ? 'bg-blue-800 text-white' : 'text-white hover:text-white hover:bg-blue-800', 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold']">
+                    <a :href="item.href" :class="[item.href === route.path ? 'bg-blue-800 text-white' : 'text-white hover:text-white hover:bg-blue-800', 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold']">
                       <component :is="item.icon" class="h-6 w-6 shrink-0" aria-hidden="true" />
                       {{ item.name }}
                     </a>
@@ -71,12 +60,19 @@
                 </ul>
               </li>
               <li>
-                <div class="text-xs font-semibold leading-6 text-white">Your teams</div>
-                <ul role="list" class="-mx-2 mt-2 space-y-1">
-                  <li v-for="team in teams" :key="team.name">
-                    <a :href="team.href" :class="[team.current ? 'bg-blue-800 text-white' : 'text-white hover:text-white hover:bg-blue-800', 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold']">
-                      <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-blue-700 bg-blue-800 text-[0.625rem] font-medium text-white group-hover:text-white">{{ team.initial }}</span>
-                      <span class="truncate">{{ team.name }}</span>
+                <div class="group flex gap-x-3 text-xl font-semibold leading-6 text-white">
+                  <component :is="ChatBubbleOvalLeftEllipsisIcon" class="h-6 w-6 shrink-0" aria-hidden="true" />
+                  Chats
+                  <div style="margin-left: auto;">
+                    <a href="#" class="justify-end">
+                      <component :is="PlusCircleIcon" class="h-6 w-6 shrink-0" aria-hidden="true" />
+                    </a>
+                  </div>
+                </div>
+                <ul role="list" class="-mx-2 mt-2">
+                  <li v-for="chat in chats" :key="chat.titulo" class="ml-5">
+                    <a :href="'/chats/'+chat.session_id" :class="[chatId == chat.session_id ? 'bg-blue-800 text-white' : 'text-white hover:text-white hover:bg-blue-800', 'group flex gap-x-3 rounded-md pl-2 p-1 text-xs font-thin']">
+                      <span class="truncate">{{ chat.titulo }}</span>
                     </a>
                   </li>
                 </ul>
@@ -114,47 +110,38 @@
     </div>
   </template>
   
-  <script setup>
-import { ref, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+  <script setup lang="ts">
+import { authStore } from '@/stores/auth'
+import { ref } from 'vue'
 import {
   Bars3Icon,
   DocumentTextIcon,
   XMarkIcon,
-  ChatBubbleOvalLeftEllipsisIcon
+  ChatBubbleOvalLeftEllipsisIcon,
+  HomeIcon
 } from '@heroicons/vue/24/outline'
+import { PlusCircleIcon, PlusIcon } from '@heroicons/vue/20/solid';
+import { type ChatSession } from '@/models/Chatsession/List'
 
 const navigation = ref([
-  { name: 'Chat', href: '/', icon: ChatBubbleOvalLeftEllipsisIcon, current: false },
-  { name: 'Documentos', href: '/documentos', icon: DocumentTextIcon, current: false },
- // { name: 'Reports', href: '#', icon: ChartPieIcon, current: false },
-])
-const teams = ref([
-  //{ id: 1, name: 'Heroicons', href: '#', initial: 'H', current: false },
-  //{ id: 2, name: 'Tailwind Labs', href: '#', initial: 'T', current: false },
-  //{ id: 3, name: 'Workcation', href: '#', initial: 'W', current: false },
+  { name: 'Home', href: '/home', icon: HomeIcon},
+  { name: 'Documentos', href: '/documentos', icon: DocumentTextIcon},
 ])
 
 const sidebarOpen = ref(false)
-const router = useRouter()
 const route = useRoute()
-
-function setActive(item) {
-  navigation.value.forEach(navItem => {
-    navItem.current = navItem.name === item.name
-  })
-  router.push(item.href)
+const auth = authStore()
+let chatId = 0
+if (route.params.id){
+  chatId = parseInt(route.params.id[0])
 }
 
-watch(route, () => {
-  navigation.value.forEach(navItem => {
-    navItem.current = navItem.href === route.path
-  })
-})
+const response = await $fetch('/api/chatsession/list',{
+    headers: {
+        "Authorization" :"bearer "+auth.token
+    }
+}) as ChatSession[]
 
-onMounted(() => {
-  navigation.value.forEach(navItem => {
-    navItem.current = navItem.href === route.path
-  })
-})
+const chats = ref(response)
+
   </script>

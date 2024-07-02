@@ -26,7 +26,7 @@
 
   import { storeToRefs } from 'pinia'
   import { TransitionRoot } from '@headlessui/vue'
-  import { useNotificationStore } from '@/stores/notification.js'
+  import { useNotificationStore } from '~/stores/notification'
   import { computed } from 'vue'
 
   import NotificationMessage from '@/components/notification/Message.vue'

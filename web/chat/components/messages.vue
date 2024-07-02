@@ -25,6 +25,11 @@
 import { ref, watch } from 'vue';
 import { type IMessage } from '@/models/Message';
 import dots from './utils/dots.vue';
+const route = useRoute()
+let chatId = 0
+if (route.params.id){
+  chatId = parseInt(route.params.id[0])
+}
 
 const props = defineProps({
   messages: {

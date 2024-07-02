@@ -25,7 +25,7 @@ class ChatHistory(peewee.Model):
     """
     chathistory_id = peewee.AutoField(primary_key=True)
     session_id = peewee.ForeignKeyField(ChatSession, backref='history')
-    mensagem = peewee.CharField()
+    mensagem = peewee.CharField(max_length=4000)
     tipo = peewee.IntegerField(constraints=[peewee.Check('tipo in (0,1,2)')]) # 0 = SystemMessage / 1 = HumamMessage / 2 = AiMessage
     criado = peewee.DateTimeField(default= datetime.now)
     class Meta:

@@ -30,7 +30,7 @@
 <script>
 
   import { computed, onBeforeUnmount } from 'vue'
-  import { useNotificationStore } from '@/stores/notification'
+  import { useNotificationStore } from '~/stores/notification'
 
   export default {
     name: 'NotificationMessage',

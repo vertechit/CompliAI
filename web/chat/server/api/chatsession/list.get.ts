@@ -3,17 +3,16 @@
 export default defineEventHandler(async (e) => {
 
     try {
-       
-       const { baseURL}  = useRuntimeConfig().public
-       const { id } = e.context.params || {}
        const token = getRequestHeader(e, 'Authorization');
-       const data = await $fetch(`/deleteDocument/${id}`, {
+       const { baseURL}  = useRuntimeConfig().public
+       const data = await $fetch(`/listSession`, {
           baseURL: baseURL,
+          method: 'GET',
           headers: {
             'Authorization': token+''
-         },
-          method: 'DELETE',
+          },
           timeout: 10000,
+         
        });
        return data || []
  

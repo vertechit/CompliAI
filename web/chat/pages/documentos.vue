@@ -24,6 +24,9 @@
 </template>
 
 <script setup lang="ts">
+  definePageMeta({
+  middleware: 'auth'
+})
 import { PlusCircleIcon } from '@heroicons/vue/20/solid'
 import buttonsDefault from '@/components/buttons/default.vue'
 import SlideOversWithFooter from '@/components/slideOvers/withFooter.vue'
