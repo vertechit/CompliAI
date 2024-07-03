@@ -25,8 +25,8 @@
   const route = useRoute()
   const auth = authStore()
   const chatContainer: Ref<HTMLElement | null> = ref(null);
-    const defaultStorePinia = defaultStore()
-    const MessagesModel = ref(new Messages())
+  const defaultStorePinia = defaultStore()
+  const MessagesModel = ref(new Messages())
 
   const chatId = route.params.id;
   try{
@@ -62,6 +62,7 @@ if(result){
       MessagesModel.value.addDotsLoading()
       let result = await $fetch(`/api/chain/${chatId}`,{
         method:'POST',
+        timeout: 10000,
         headers: {
           "Authorization" :"bearer "+auth.token
         },

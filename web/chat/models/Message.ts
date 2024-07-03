@@ -5,6 +5,7 @@ export interface IMessage {
     message:string
     date:string
     type: 'request' | 'response' | 'user'
+    markdown: object
 }
 export default class Messages {
 
@@ -24,7 +25,8 @@ export default class Messages {
             type:'request',
             date:new Date().toLocaleDateString(`pt-br`,{month:'long',day:'2-digit', year:'numeric'}),
             message:'',
-            userId:0
+            userId:0,
+            markdown: {}
         })
     }
     async removeDotLoading(){

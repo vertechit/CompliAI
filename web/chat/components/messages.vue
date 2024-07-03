@@ -6,11 +6,14 @@
         <time class="text-xs font-semibold leading-6 text-gray-400">{{ message.date }}</time>
       </div>
       <p v-if="message.type === 'request'" class="text-sm leading-6 text-gray-600"><dots /></p>
-      <p v-else-if="message.type === 'response'" class="rounded-lg p-2 bg-blue-800 text-sm leading-6 text-white inline-block">
+      <!-- <p v-else-if="message.type === 'response'" class="rounded-lg p-2 bg-blue-800 text-sm leading-6 text-white inline-block">
         {{ displayedTexts[index] }}
-      </p>
+      </p> -->
+      <ContentRenderer v-else-if="message.type === 'response'" class="rounded-lg p-2 bg-blue-800 text-sm leading-6 text-white inline-block" :value="displayedTexts[index]"/>
 
-      <div v-else class="text-sm leading-6 bg-gray-600 rounded-lg text-white text-end p-2 float-end inline-block">{{ message.message }}</div>
+      <div v-else class="text-sm leading-6 bg-gray-600 rounded-lg text-white p-2 float-end inline-block">{{ message.message }}</div>
+      <!-- <ContentRenderer v-else class="rounded-lg p-2 bg-blue-800 text-sm leading-6 text-white inline-block" :value="markdon"/> -->
+
     </div>
   </div>
 </template>
@@ -19,6 +22,8 @@
 import { ref, watch } from 'vue';
 import { type IMessage } from '@/models/Message';
 import dots from './utils/dots.vue';
+import markdownParser from '@nuxt/content/transformers/markdown';
+
 const route = useRoute()
 let chatId = 0
 if (route.params.id){
@@ -32,24 +37,19 @@ const props = defineProps({
   },
 });
 
-const displayedTexts = ref(props.messages.map(m => m.message));
+const displayedTexts = ref([] as Array<IMessage>);
 
-async function typeMessage(index: number, message: string, delay = 8) {
-  displayedTexts.value[index] = '';
-
-  for (let i = 0; i < message.length; i++) {
-    displayedTexts.value[index] += message.charAt(i);
-    await new Promise(r => setTimeout(r, delay));
-  }
+for(let idx in props.messages){
+  displayedTexts.value.push(await markdownParser.parse(null, props.messages[idx].message))
 }
 
-watch(() => props.messages.length, (newLength, oldLength) => {
+watch(() => props.messages.length, async (newLength, oldLength) => {
   if (newLength > oldLength) {
     const newMessageIndex = newLength - 1;
     const newMessage = props.messages[newMessageIndex];
 
     if (newMessage.type === 'response') {
-      typeMessage(newMessageIndex, newMessage.message);
+      displayedTexts.value[newMessageIndex] = await markdownParser.parse(null, newMessage.message);
     }
   }
 });
