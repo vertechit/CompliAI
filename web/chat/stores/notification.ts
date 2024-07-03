@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import crypto from 'crypto';
+
 export const useNotificationStore = defineStore('notification', {
      
     state: () => ({
@@ -7,25 +7,25 @@ export const useNotificationStore = defineStore('notification', {
     }),
 
   actions: {
-    addNotification(payload) {
+    addNotification(payload:any) {
       this.notifications.push({
         ...payload,
         id: (Math.random().toString(36) + Date.now().toString(36)).substr(2),
       });
     },
-    removeNotification(payload) {
+    removeNotification(payload:any) {
       this.notifications = this.notifications.filter(
         (notification) => notification.id != payload.id,
       );
     },
-    successNotification(title = null, message) {
+    successNotification(title = null, message:string) {
       this.addNotification({
         type: "success",
         title: title || "Tudo Certo!",
         message: message,
       });
     },
-    errorNotification(title,message) {
+    errorNotification(title:string | null = null, message:string) {
       this.addNotification({
         type: "error",
         title: title || "Ops! Algo deu errado!",

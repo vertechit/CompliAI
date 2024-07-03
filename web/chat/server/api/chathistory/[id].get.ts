@@ -1,19 +1,24 @@
+
+
 export default defineEventHandler(async (e) => {
+
     try {
-       const { baseURL}  = useRuntimeConfig().public
-       const { id } = e.context.params || {}
        const token = getRequestHeader(e, 'Authorization');
-       const data = await $fetch(`/deleteDocument/${id}`, {
+       const { id } = e.context.params || {}
+       const { baseURL}  = useRuntimeConfig().public
+       const data = await $fetch(`/listHistory/${id}`, {
           baseURL: baseURL,
+          method: 'GET',
           headers: {
             'Authorization': token+''
-         },
-          method: 'DELETE',
+          },
           timeout: 10000,
+         
        });
        return data || []
  
     } catch (error:any) {
+       console.log(error)
        throw error
     }
  

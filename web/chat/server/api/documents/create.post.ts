@@ -10,9 +10,13 @@ export default defineEventHandler(async (e) => {
         newFormData.append('file', file);
         let description = formData.get('description') as string
         
-        const { baseURL}  = useRuntimeConfig().public
+        const { baseURL}  = useRuntimeConfig().public        
+        const token = getRequestHeader(e, 'Authorization');
         await $fetch(`/createDocument/?filename=${filenameWithoutExtension}&description=${description}`, {
             baseURL: baseURL,
+            headers: {
+                'Authorization': token+''
+             },
             method: 'POST',
             body:newFormData,
             timeout: 10000,

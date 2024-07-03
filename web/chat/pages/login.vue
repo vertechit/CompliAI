@@ -10,11 +10,11 @@
             </div>
 
             <div class="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
-                <form class="space-y-3" action="#" method="POST">
+                <div class="space-y-3">
                     <div>
                         <div class="flex items-center w-full relative border-[1.5px] border-gray-300 rounded-lg px-2 focus:shadow">
                         <IconsMail  />
-                        <input id="email" name="email"  autocomplete="off" type="email" placeholder="Email" 
+                        <input id="email" name="email"  autocomplete="off"  placeholder="Email" v-model="email"
                         class="block w-full py-1.5 text-gray-900 shadow-sm 
                                 ring-inset ring-gray-300 placeholder:text-gray-400 
                                 focus:ring-0  sm:text-sm sm:leading-6 focus:outline-none
@@ -25,7 +25,7 @@
                     <div>
                         <div class="flex focus:bg-gray-800 items-center w-full relative border-[1.5px] border-gray-300 rounded-lg px-2 focus:shadow">
                             <IconsKey  />
-                            <input id="password" name="password"     autocomplete="off" type="password" placeholder="Senha" 
+                            <input id="password" name="password"     autocomplete="off" type="password" placeholder="Senha" v-model="password"
                                 class="block w-full py-1.5 text-gray-900 shadow-sm 
                                 ring-inset ring-gray-300 placeholder:text-gray-400 
                                 focus:ring-0  sm:text-sm sm:leading-6 focus:outline-none
@@ -34,16 +34,16 @@
                         </div>
                     </div>
                     <div class="mt-2">
-                        <button type="submit" class="flex 
+                        <button type="submit" @click="handleSubmit" class="flex 
                         w-full justify-center rounded-lg bg-blue-600 
                         p-3  text-sm font-semibold leading-6
                         text-white shadow-sm hover:bg-blue-700 focus-visible:outline 
                         focus-visible:outline-2 focus-visible:outline-offset-2 
                         focus-visible:outline-blue-700">Entrar</button>
                     </div>
-                   
+                    <div class="text-red-500">{{ errorMessage }}</div>
                   
-                </form>
+                </div>
             </div>
         </div>
     </div>
@@ -51,9 +51,28 @@
 </template>
 
 <script setup lang="ts">
+import { useRoute } from 'vue-router';
+
 definePageMeta({
-    layout: false
-})
+  layout: false,
+});
+
+let email = '';
+let password = '';
+const route = useRoute();
+const errorMessage = ref(route.query.message);
+const auth = authStore()
+await auth.logout()
+
+const handleSubmit = async () => {
+    try {
+        await auth.authenticate(email, password)
+        await navigateTo('/home')
+    } catch (error) {
+        errorMessage.value = 'Erro no login. Verifique suas credenciais.'
+    }
+};
+
 </script>
 <style scoped>
 .container-main {

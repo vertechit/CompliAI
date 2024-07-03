@@ -11,6 +11,7 @@ from utils.utils import destroyDatabases, initDatabases
 from api.auth import CurrentUser, create_access_token, Token, ACCESS_TOKEN_EXPIRE_MINUTES, validade_admin_user, get_current_user
 from datetime import timedelta
 from agents.agent import graph
+from controllers.ChatHistoryController import insert_history
 
 tags_metadata = [
     {"name": "LLMs", "description": "Chamadas para as LLMs"},
@@ -65,12 +66,13 @@ def llm_chain_retriever_hist_title_api(current_user: Annotated[CurrentUser, Depe
 
 @app.post("/graph/{session_id}", tags=["LLMs"])
 def graph_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], session_id: int, chat: InputChat)-> ResponseChat:
+    insert_history(session_id=session_id, mensagem=chat.HumamMessage, tipo=1)
     ret = graph.invoke({
         "messages": [
             ("user", chat.HumamMessage),
             ]
         })
-    print(ret)
+    insert_history(session_id=session_id, mensagem=ret['messages'][-1].content, tipo=2)
     response = ResponseChat(AiMessage=ret['messages'][-1].content)
     return response
 

@@ -3,7 +3,7 @@ export default defineEventHandler(async (e) => {
        const { baseURL}  = useRuntimeConfig().public
        const { id } = e.context.params || {}
        const token = getRequestHeader(e, 'Authorization');
-       const data = await $fetch(`/deleteDocument/${id}`, {
+       const data = await $fetch(`/deleteSession/${id}`, {
           baseURL: baseURL,
           headers: {
             'Authorization': token+''
@@ -14,6 +14,7 @@ export default defineEventHandler(async (e) => {
        return data || []
  
     } catch (error:any) {
+       console.log(error)
        throw error
     }
  
