@@ -1,9 +1,5 @@
-
-
 export default defineEventHandler(async (e) => {
-
     try {
-       
        const { baseURL}  = useRuntimeConfig().public
        const { id } = e.context.params || {}
        const token = getRequestHeader(e, 'Authorization');
@@ -18,7 +14,6 @@ export default defineEventHandler(async (e) => {
        return data || []
  
     } catch (error:any) {
-       console.log(error)
        throw error
     }
  
