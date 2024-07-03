@@ -34,7 +34,7 @@ const props = defineProps({
 
 const displayedTexts = ref(props.messages.map(m => m.message));
 
-async function typeMessage(index: number, message: string, delay = 30) {
+async function typeMessage(index: number, message: string, delay = 8) {
   displayedTexts.value[index] = '';
 
   for (let i = 0; i < message.length; i++) {
