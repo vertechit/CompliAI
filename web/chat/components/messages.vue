@@ -1,22 +1,18 @@
 <template>
-  <div class="flex items-center gap-x-4 py-6 pr-2" v-for="(message, index) in messages" :key="index" :type="message.type">
-    <div v-if="message.userId === 0" class="h-10 w-10 rounded-full bg-gray-800 flex items-center">
-      <img  class="scale-90" src="~/assets/img/logo_white.png" alt="" />
-    </div>
-    <img v-else class="h-10 w-10 rounded-full bg-gray-800" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
+  <div class="flex items-center gap-x-4 py-2 pr-2" v-for="(message, index) in messages" :key="index" :type="message.type">
     <div class="flex-1">
       <div class="flex items-center justify-between">
-        <h1 class="text-lg font-semibold leading-6 text-white"></h1>
+        <h1 v-if="message.type === 'user'" class="text-lg font-semibold leading-6 text-white"></h1>
         <time class="text-xs font-semibold leading-6 text-gray-400">{{ message.date }}</time>
       </div>
-      <p v-if="message.type === 'request'" class="mt-1 text-sm leading-6 text-gray-600"><dots /></p>
-      <p v-else-if="message.type === 'response'" class="mt-1 text-sm leading-6 text-gray-600">
+      <p v-if="message.type === 'request'" class="text-sm leading-6 text-gray-600"><dots /></p>
+      <p v-else-if="message.type === 'response'" class="rounded-lg p-2 bg-blue-800 text-sm leading-6 text-white inline-block">
         {{ displayedTexts[index] }}
       </p>
 
-      <p v-else class="mt-1 text-sm leading-6 text-gray-600">{{ message.message }}</p>
+      <div v-else class="text-sm leading-6 bg-gray-600 rounded-lg text-white text-end p-2 float-end inline-block">{{ message.message }}</div>
 
-      <hr class="mt-1">
+      <!-- <hr class="mt-1"> -->
     </div>
   </div>
 </template>
@@ -24,6 +20,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { type IMessage } from '@/models/Message';
+import { UserCircleIcon } from '@heroicons/vue/24/outline';
 import dots from './utils/dots.vue';
 const route = useRoute()
 let chatId = 0

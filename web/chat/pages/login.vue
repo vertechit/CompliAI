@@ -40,7 +40,6 @@
                         text-white shadow-sm hover:bg-blue-700 focus-visible:outline 
                         focus-visible:outline-2 focus-visible:outline-offset-2 
                         focus-visible:outline-blue-700">Entrar</button>
-                        <button @click="redirectToDocumentos">Testar Redirecionamento</button>
                     </div>
                     <div class="text-red-500">{{ errorMessage }}</div>
                   
@@ -52,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 definePageMeta({
   layout: false,
@@ -60,23 +59,18 @@ definePageMeta({
 
 let email = '';
 let password = '';
-const errorMessage = ref("");
+const route = useRoute();
+const errorMessage = ref(route.query.message);
 const auth = authStore()
-const router = useRouter();
 await auth.logout()
 
 const handleSubmit = async () => {
     try {
         await auth.authenticate(email, password)
-        await router.push('/home')
         await navigateTo('/home')
     } catch (error) {
         errorMessage.value = 'Erro no login. Verifique suas credenciais.'
     }
-};
-
-const redirectToDocumentos = () => {
-    router.push('/documentos');
 };
 
 </script>

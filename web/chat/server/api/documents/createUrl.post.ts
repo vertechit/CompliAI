@@ -2,22 +2,22 @@
 export default defineEventHandler(async (e) => {
 
     try {
-        const { pergunta } = await readBody(e)
         const { baseURL}  = useRuntimeConfig().public        
         const token = getRequestHeader(e, 'Authorization');
-
-        const retorno = await $fetch(`/createSession`, {
+        const { titulo, description, url} = await readBody(e)
+        await $fetch(`/createDocumentUrl`, {
             baseURL: baseURL,
             headers: {
                 'Authorization': token+''
              },
             method: 'POST',
             body: {
-                "Pergunta": pergunta
+                titulo,
+                description,
+                url
             },
             timeout: 10000,
         });
-        return retorno
 
     } catch (error:any) {
        console.log(error)

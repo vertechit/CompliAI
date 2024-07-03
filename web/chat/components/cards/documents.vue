@@ -65,7 +65,7 @@ const getList = async () => {
         }) as Documents[]
         listDocuments.value = response
     } catch (error) {
-        console.error(error)
+        clearError({ redirect: '/login?message=Token expirado' })
     }finally{
         setLoading(false)
     }
@@ -79,12 +79,17 @@ const deleteDocument = async (documentId: number) => {
     try {
         setLoading(true)
         const token = auth.token
-        await $fetch(`/api/documents/${documentId}`, {
+        try{
+            await $fetch(`/api/documents/${documentId}`, {
             method: 'DELETE',
             headers: {
                 "Authorization" :"bearer "+token
             }
-        })
+            })
+        }catch(error){
+            clearError({ redirect: '/login?message=Token expirado' })
+        }
+
         await getList()
     } catch (error) {
         console.error(error)

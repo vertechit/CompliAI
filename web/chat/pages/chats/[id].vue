@@ -29,27 +29,32 @@
     const MessagesModel = ref(new Messages())
 
   const chatId = route.params.id;
-
-  let result = await $fetch(`/api/chathistory/${chatId}`,{
+  try{
+    let result = [] as any[];
+    result = await $fetch(`/api/chathistory/${chatId}`,{
         method:'GET',
         headers: {
           "Authorization" :"bearer "+auth.token
         }
       }) as []
-      
+
       result.reverse()
 
-  if(result){
-    for (let i in result){
-      if (result[i].tipo === 1){
-        MessagesModel.value.addMessage({date: result[i].criado ,id: result[i].chathistory_id,type:'user',userId:1,message: result[i].mensagem})
-      }else{
-        MessagesModel.value.addMessage({date: result[i].criado ,id: result[i].chathistory_id,type:'response',userId:0,message: result[i].mensagem})
-      }
-      
+if(result){
+  for (let i in result){
+    if (result[i].tipo === 1){
+      MessagesModel.value.addMessage({date: result[i].criado ,id: result[i].chathistory_id,type:'user',userId:1,message: result[i].mensagem})
+    }else{
+      MessagesModel.value.addMessage({date: result[i].criado ,id: result[i].chathistory_id,type:'response',userId:0,message: result[i].mensagem})
     }
+    
   }
+}
 
+  }catch(error){
+    clearError({ redirect: '/login?message=Token expirado' })
+  }
+  
   const submit = async (message: string) => {
     setLoading(true)
     try {
@@ -61,7 +66,6 @@
           "Authorization" :"bearer "+auth.token
         },
         body:{
-          "SystemMessage": "Responde de forma educada",
           "HumamMessage": message,
         }
       }) as { AiMessage: string}

@@ -2,7 +2,8 @@ import { defineStore } from 'pinia'
 
 export const authStore = defineStore('authStore', {
     state: () => ({
-      token: useCookie('token')
+      token: useCookie('token'),
+      login: useCookie('login')
     }),
     actions: {
       async authenticate(email: string, senha: string) {
@@ -21,6 +22,16 @@ export const authStore = defineStore('authStore', {
             secure: true,
           })
           tokenCookie.value = result.access_token
+
+          const loginCookie = useCookie('login', {
+            maxAge: 60*24*28,
+            sameSite: true,
+            secure: true,
+          })
+          loginCookie.value = email
+
+          this.token = result.access_token
+          this.login = email
 
       },
       async logout(){

@@ -25,7 +25,7 @@ export const useNotificationStore = defineStore('notification', {
         message: message,
       });
     },
-    errorNotification(title:string, message:string) {
+    errorNotification(title:string | null = null, message:string) {
       this.addNotification({
         type: "error",
         title: title || "Ops! Algo deu errado!",

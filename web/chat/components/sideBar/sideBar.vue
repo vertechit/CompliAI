@@ -33,6 +33,27 @@
                           </li>
                         </ul>
                       </li>
+                      <li>
+                        <div class="group flex gap-x-3 text-xl font-semibold leading-6 text-white">
+                          <component :is="ChatBubbleOvalLeftEllipsisIcon" class="h-6 w-6 shrink-0" aria-hidden="true" />
+                          Chats
+                          <div style="margin-left: auto;">
+                            <a href="#" class="justify-end">
+                              <component :is="PlusCircleIcon" class="h-6 w-6 shrink-0" aria-hidden="true" @click="changeModalCriarChat(true)"/>
+                            </a>
+                          </div>
+                        </div>
+                        <ul role="list" class="-mx-2 mt-2 max-h-[500px] overflow-y-auto overflow-x-hidden">
+                          <li v-for="chat in chats" :key="chat.titulo" class="ml-5 hover:bg-blue-800 group relative">
+                            <a :href="'/chats/'+chat.session_id" :class="[chatId == chat.session_id ? 'bg-blue-800 text-white' : 'text-white hover:text-white', 'flex gap-x-3 rounded-md pl-2 p-1 text-xs font-thin']">
+                              <span class="truncate" :title="chat.titulo">{{ chat.titulo }}</span>
+                            </a>
+                            <div class="absolute inset-y-0 right-1 hidden group-hover:block bg-blue-800">
+                                <component :is="TrashIcon" class="text-neutral-500 h-6 w-6 " aria-hidden="true" @click="openDeleteDialog(chat.session_id, chat.titulo)"/>
+                              </div>
+                          </li>
+                        </ul>
+                      </li>
                     </ul>
                   </nav>
                 </div>
@@ -65,23 +86,26 @@
                   Chats
                   <div style="margin-left: auto;">
                     <a href="#" class="justify-end">
-                      <component :is="PlusCircleIcon" class="h-6 w-6 shrink-0" aria-hidden="true" />
+                      <component :is="PlusCircleIcon" class="h-6 w-6 shrink-0" aria-hidden="true" @click="changeModalCriarChat(true)"/>
                     </a>
                   </div>
                 </div>
-                <ul role="list" class="-mx-2 mt-2">
-                  <li v-for="chat in chats" :key="chat.titulo" class="ml-5">
-                    <a :href="'/chats/'+chat.session_id" :class="[chatId == chat.session_id ? 'bg-blue-800 text-white' : 'text-white hover:text-white hover:bg-blue-800', 'group flex gap-x-3 rounded-md pl-2 p-1 text-xs font-thin']">
-                      <span class="truncate">{{ chat.titulo }}</span>
+                <ul role="list" class="-mx-2 mt-2 max-h-[500px] overflow-y-auto overflow-x-hidden">
+                  <li v-for="chat in chats" :key="chat.titulo" class="ml-5 hover:bg-blue-800 group relative">
+                    <a :href="'/chats/'+chat.session_id" :class="[chatId == chat.session_id ? 'bg-blue-800 text-white' : 'text-white hover:text-white', 'flex gap-x-3 rounded-md pl-2 p-1 text-xs font-thin']">
+                      <span class="truncate" :title="chat.titulo">{{ chat.titulo }}</span>
                     </a>
+                    <div class="absolute inset-y-0 right-1 hidden group-hover:block bg-blue-800">
+                        <component :is="TrashIcon" class="text-neutral-500 h-6 w-6 " aria-hidden="true" @click="openDeleteDialog(chat.session_id, chat.titulo)"/>
+                      </div>
                   </li>
                 </ul>
               </li>
               <li class="-mx-6 mt-auto">
                 <a href="#" class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-blue-800">
-                  <img class="h-8 w-8 rounded-full bg-blue-800" src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
+                  <component :is="UserCircleIcon" class="h-8 w-8"></component>
                   <span class="sr-only">Your profile</span>
-                  <span aria-hidden="true">Bete</span>
+                  <span aria-hidden="true">{{auth.login}}</span>
                 </a>
               </li>
             </ul>
@@ -94,14 +118,38 @@
           <span class="sr-only">Open sidebar</span>
           <Bars3Icon class="h-6 w-6" aria-hidden="true" />
         </button>
-        <div class="flex-1 text-sm font-semibold leading-6 text-white">Chat</div>
-        <a href="#">
-          <span class="sr-only">Your profile</span>
-          <img class="h-8 w-8 rounded-full bg-blue-800" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
+        <div class="flex-1 text-sm font-semibold leading-6 text-white">Menu</div>
+        <a href="#" class="text-white">
+          <div class="flex">
+            <span class="sr-only">Your profile</span>
+            <component :is="UserCircleIcon" class="h-8 w-8"></component>
+            <span class="sr-only">Your profile</span>
+            <span aria-hidden="true">{{auth.login}}</span>
+          </div>
         </a>
       </div>
   
       <main class="lg:pl-72">
+        <ModalConfirmDelete
+          title="Atenção"
+          :text="'Deseja realmente excluir a sessão '+currentTitle+'?'"
+          :isOpen="isOpenModalDelete"
+          @confirm="deleteSesssion(currentElement)"
+          @close="close()"
+          >
+        </ModalConfirmDelete>
+
+        <SlideOversWithFooter  v-if="modalCriarChat" title="Iniciar novo chat" @close="changeModalCriarChat(false)" >
+            <template #content>
+                <FormFormsCriarChat :chat-list="chatList" :clear-form="clearForm" :submit-form="submitForm" @close="forceGetList = !forceGetList ,changeModalCriarChat(false)"  />
+            </template>
+            <template #footer>
+                <div class="space-x-2">
+                    <buttonsDefault @action="clearForm = !clearForm" label="Limpar" custom="white !text-black border hover:bg-gray-100" />
+                    <buttonsDefault @action="submitForm = !submitForm" label="Enviar" custom="bg-green-500 hover:bg-green-600" />
+                </div>
+            </template>
+        </SlideOversWithFooter>
         <div class="pl-4 ">
         
           <slot />
@@ -118,10 +166,46 @@ import {
   DocumentTextIcon,
   XMarkIcon,
   ChatBubbleOvalLeftEllipsisIcon,
-  HomeIcon
+  HomeIcon,
+  TrashIcon
 } from '@heroicons/vue/24/outline'
-import { PlusCircleIcon, PlusIcon } from '@heroicons/vue/20/solid';
+import { PlusCircleIcon, PlusIcon, UserCircleIcon } from '@heroicons/vue/20/solid';
 import { type ChatSession } from '@/models/Chatsession/List'
+
+const submitForm = ref(false)
+const clearForm = ref(false)
+const forceGetList = ref(false)
+const chatList = ref([] as ChatSession[])
+const chats = ref(chatList)
+const isOpenModalDelete = ref(false)
+const currentElement = ref(0)
+const currentTitle = ref('')
+
+const modalCriarChat = ref(false)
+const changeModalCriarChat = (value: boolean) => modalCriarChat.value = value
+
+const close = async () => {
+    isOpenModalDelete.value = false;
+    currentElement.value = 0
+}
+
+const openDeleteDialog = async (value: number, titulo: string) => {
+  isOpenModalDelete.value = true
+  currentElement.value = value
+  currentTitle.value = '"'+titulo+'"'
+}
+
+const deleteSesssion = async (value: number) => {
+  await $fetch(`/api/chatsession/${value}`,{
+    method: "DELETE",
+    headers: {
+        "Authorization" :"bearer "+auth.token
+    }
+  })
+  await getSessions()
+  await navigateTo('/home')
+  await close()
+}
 
 const navigation = ref([
   { name: 'Home', href: '/home', icon: HomeIcon},
@@ -131,17 +215,32 @@ const navigation = ref([
 const sidebarOpen = ref(false)
 const route = useRoute()
 const auth = authStore()
-let chatId = 0
+let chatId = ref(0)
 if (route.params.id){
-  chatId = parseInt(route.params.id[0])
+  chatId.value = parseInt(route.params.id as string)
 }
 
-const response = await $fetch('/api/chatsession/list',{
-    headers: {
-        "Authorization" :"bearer "+auth.token
-    }
-}) as ChatSession[]
 
-const chats = ref(response)
+const getSessions = async () => {
+  try{
+     let retorno
+     retorno = await $fetch('/api/chatsession/list',{
+      method: "GET",
+      headers: {
+        "Authorization" :"bearer "+auth.token
+      }
+    }) as ChatSession[]
+
+    chatList.value = retorno.reverse()
+  }catch(error){
+    clearError({ redirect: '/login?message=Token expirado' })
+  }
+
+}
+await getSessions()
+
+watch(() => route.fullPath, () => {
+    chatId.value = parseInt(route.params.id as string)
+});
 
   </script>
