@@ -5,14 +5,14 @@ Para utilizar este projeto recomendo utilizar o Linux e caso esteja no Windows u
   
 ## Como iniciar o projeto
 1. Criar ambiente virtual
-```
+```bash
 # Linux / WSL
 python3 -m venv .venv
 # Windows
 python -m venv .venv
 ```
 2. Ativar o ambiente
-```
+```bash
 # Linux / WSL
 . ./.venv/bin/activate
 # Windows
@@ -23,14 +23,14 @@ python -m venv .venv
 > `which python3` ou `gcm python` no windows
 
 3. Instalar as bibliotecas
-```
+```bash
 pip install -r ./app/requirements.txt
 ```
 
 ## Utilizar o Genie
 Após o ambiente configurado é possível usar o "genie" que é um Chat com o GPT para ser utilizado no Terminal.  
 Para abrir, digite
-```
+```bash
 # Linux
 python3 app/main.py
 
@@ -42,14 +42,14 @@ python genie/main.py
 
 ### Subir aplicação inteira
 Para subir a aplicação copie o arquivo `example.env` para o arquivo `./deploy/.env` e substitua os valores das chaves de API antes de subir a aplicação
-```
+```bash
 docker compose up --build
 # Para habilitar o Watch
 docker compose watch
 ```
 
 ### Rodar a imagem Docker
-```
+```bash
 # Teste de chamada da API
 curl -X POST http://127.0.0.1:8080/chain --data '{"HumamMessage": "Quem é o presidente do Brasil?"}' -H "content-type: application/json"
 
@@ -62,7 +62,7 @@ curl -X 'POST' \
 ```
 
 ### Subir o Genie no Docker
-```
+```bash
 docker exec -it compliai-api-1 python3 main.py
 ```
 
