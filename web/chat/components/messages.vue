@@ -2,7 +2,7 @@
   <div class="flex items-center gap-x-4 py-2 pr-2" v-for="(message, index) in messages" :key="index" :type="message.type">
     <div class="flex-1">
       <div class="flex items-center justify-between">
-        <h1 v-if="message.type === 'user'" class="text-lg font-semibold leading-6 text-white"></h1>
+        <div v-if="message.type === 'user'" class="text-lg font-semibold leading-6 text-white"></div>
         <time class="text-xs font-semibold leading-6 text-gray-400">{{ message.date }}</time>
       </div>
       <p v-if="message.type === 'request'" class="text-sm leading-6 text-gray-600"><dots /></p>
@@ -11,8 +11,6 @@
       </p>
 
       <div v-else class="text-sm leading-6 bg-gray-600 rounded-lg text-white text-end p-2 float-end inline-block">{{ message.message }}</div>
-
-      <!-- <hr class="mt-1"> -->
     </div>
   </div>
 </template>
@@ -20,7 +18,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { type IMessage } from '@/models/Message';
-import { UserCircleIcon } from '@heroicons/vue/24/outline';
 import dots from './utils/dots.vue';
 const route = useRoute()
 let chatId = 0

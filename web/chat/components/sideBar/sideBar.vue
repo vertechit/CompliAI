@@ -22,9 +22,9 @@
                     <img class="h-8 w-auto" src="~/assets/img/logoCompliIc.png" alt="Compliance Soluções" />
                   </div>
                   <nav class="flex flex-1 flex-col">
-                    <ul role="list" class="flex flex-1 flex-col gap-y-7">
+                    <ul  class="flex flex-1 flex-col gap-y-7">
                       <li>
-                        <ul role="list" class="-mx-2 space-y-1">
+                        <ul  class="-mx-2 space-y-1">
                           <li v-for="item in navigation" :key="item.name">
                             <a :href="item.href" :class="[item.href === route.path ? 'bg-blue-800 text-white' : 'text-white hover:text-white hover:bg-blue-800', 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold']">
                               <component :is="item.icon" class="h-6 w-6 shrink-0" aria-hidden="true" />
@@ -43,7 +43,7 @@
                             </a>
                           </div>
                         </div>
-                        <ul role="list" class="-mx-2 mt-2 max-h-[500px] overflow-y-auto overflow-x-hidden">
+                        <ul  class="-mx-2 mt-2 max-h-[500px] overflow-y-auto overflow-x-hidden">
                           <li v-for="chat in chats" :key="chat.titulo" class="ml-5 hover:bg-blue-800 group relative">
                             <a :href="'/chats/'+chat.session_id" :class="[chatId == chat.session_id ? 'bg-blue-800 text-white' : 'text-white hover:text-white', 'flex gap-x-3 rounded-md pl-2 p-1 text-xs font-thin']">
                               <span class="truncate" :title="chat.titulo">{{ chat.titulo }}</span>
@@ -69,9 +69,9 @@
             <img class="w-auto h-full" src="~/assets/img/logoCompliIc.png" alt="Compliance Soluções" />
           </div>
           <nav class="flex flex-1 flex-col">
-            <ul role="list" class="flex flex-1 flex-col gap-y-7">
+            <ul  class="flex flex-1 flex-col gap-y-7">
               <li>
-                <ul role="list" class="-mx-2 space-y-1">
+                <ul  class="-mx-2 space-y-1">
                   <li v-for="item in navigation" :key="item.name">
                     <a :href="item.href" :class="[item.href === route.path ? 'bg-blue-800 text-white' : 'text-white hover:text-white hover:bg-blue-800', 'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold']">
                       <component :is="item.icon" class="h-6 w-6 shrink-0" aria-hidden="true" />
@@ -90,7 +90,7 @@
                     </a>
                   </div>
                 </div>
-                <ul role="list" class="-mx-2 mt-2 max-h-[500px] overflow-y-auto overflow-x-hidden">
+                <ul  class="-mx-2 mt-2 max-h-[500px] overflow-y-auto overflow-x-hidden">
                   <li v-for="chat in chats" :key="chat.titulo" class="ml-5 hover:bg-blue-800 group relative">
                     <a :href="'/chats/'+chat.session_id" :class="[chatId == chat.session_id ? 'bg-blue-800 text-white' : 'text-white hover:text-white', 'flex gap-x-3 rounded-md pl-2 p-1 text-xs font-thin']">
                       <span class="truncate" :title="chat.titulo">{{ chat.titulo }}</span>
@@ -169,7 +169,7 @@ import {
   HomeIcon,
   TrashIcon
 } from '@heroicons/vue/24/outline'
-import { PlusCircleIcon, PlusIcon, UserCircleIcon } from '@heroicons/vue/20/solid';
+import { PlusCircleIcon, UserCircleIcon } from '@heroicons/vue/20/solid';
 import { type ChatSession } from '@/models/Chatsession/List'
 
 const submitForm = ref(false)
