@@ -10,7 +10,7 @@ WORKDIR $APP_HOME
 COPY chat/package*.json ./
 COPY chat /usr/src/app
 
-ENV WEB_BASE_URL='http://api:80'
+ENV WEB_BASE_URL='http://api:8080'
 
 RUN rm -rf node_modules && yarn install --ignore-scripts --frozen-lockfile && yarn cache clean --force
 RUN yarn build
