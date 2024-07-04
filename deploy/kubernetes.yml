@@ -52,13 +52,13 @@ spec:
       labels:
         app: db
     spec:
+      automountServiceAccountToken: false
       containers:
       - name: postgres
         image: postgres:latest
         resources:
           limits:
             memory: 1Gi
-        automountServiceAccountToken: false
         ports:
         - containerPort: 5432
         env:
@@ -83,13 +83,13 @@ spec:
       labels:
         app: qdrant
     spec:
+      automountServiceAccountToken: false
       containers:
       - name: qdrant
         image: qdrant/qdrant
         resources:
           limits:
             memory: 1Gi
-        automountServiceAccountToken: false
         ports:
         - containerPort: 6333
 ---
@@ -108,13 +108,13 @@ spec:
       labels:
         app: api
     spec:
+      automountServiceAccountToken: false
       containers:
       - name: api
         image: devcst/compliai:latest
         resources:
           limits:
             memory: 1Gi
-        automountServiceAccountToken: false
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
@@ -181,13 +181,13 @@ spec:
       labels:
         app: frontend
     spec:
+      automountServiceAccountToken: false
       containers:
       - name: webchat
         image: devcst/compliaiweb:latest
         resources:
           limits:
             memory: 1Gi
-        automountServiceAccountToken: false
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
