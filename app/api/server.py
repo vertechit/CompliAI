@@ -120,10 +120,15 @@ def deleta_documento_api(current_user: Annotated[CurrentUser, Depends(get_curren
 @app.post("/createSession/", tags=["Chat"])
 def create_session_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], pergunta: InputPergunta = None) -> SessaoObj: 
     sessao = create_sessao(pergunta, current_user.user_id)
-    print(sessao)
     response = SessaoObj(session_id=sessao[0], titulo=sessao[1], criado=sessao[2], user_id=sessao[3].user_id)
     if pergunta != None:
-        chain_with_history(pergunta.Pergunta, sessao[0], current_user.user_id)
+        insert_history(session_id=sessao[0], mensagem=pergunta.Pergunta, tipo=1)
+        ret = graph.invoke({
+            "messages": [
+                ("user", pergunta.Pergunta),
+                ]
+            })
+        insert_history(session_id=sessao[0], mensagem=ret['messages'][-1].content, tipo=2)
     return response
 
 @app.get("/listSession", tags=["Chat"])
@@ -163,7 +168,7 @@ def deleta_sessao_api(current_user: Annotated[CurrentUser, Depends(get_current_u
 
 # APIS de controle de Usuários
 @app.post("/createUsers", tags=["Usuários"])
-def create_user_api(admin_user: Annotated[str, Depends(validade_admin_user)], user: InputUser):
+def create_user_api(user: InputUser):
     usu:int = 0
     try:
         usu = create_user(user.username, user.password)
