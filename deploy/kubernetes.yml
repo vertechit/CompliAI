@@ -55,6 +55,9 @@ spec:
       containers:
       - name: postgres
         image: postgres:latest
+        resources:
+          limits:
+            memory: 1Gi
         ports:
         - containerPort: 5432
         env:
@@ -82,6 +85,9 @@ spec:
       containers:
       - name: qdrant
         image: qdrant/qdrant
+        resources:
+          limits:
+            memory: 1Gi
         ports:
         - containerPort: 6333
 ---
