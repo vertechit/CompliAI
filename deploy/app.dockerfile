@@ -16,4 +16,4 @@ COPY app /code
 
 VOLUME [ "/data" ]
 
-CMD ["uvicorn", "api.server:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "api.server:app", "--host", "0.0.0.0", "--port", "8080"]
