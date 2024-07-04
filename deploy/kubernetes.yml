@@ -58,6 +58,7 @@ spec:
         resources:
           limits:
             memory: 1Gi
+        automountServiceAccountToken: false
         ports:
         - containerPort: 5432
         env:
@@ -88,6 +89,7 @@ spec:
         resources:
           limits:
             memory: 1Gi
+        automountServiceAccountToken: false
         ports:
         - containerPort: 6333
 ---
@@ -109,6 +111,10 @@ spec:
       containers:
       - name: api
         image: devcst/compliai:latest
+        resources:
+          limits:
+            memory: 1Gi
+        automountServiceAccountToken: false
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
@@ -178,6 +184,10 @@ spec:
       containers:
       - name: webchat
         image: devcst/compliaiweb:latest
+        resources:
+          limits:
+            memory: 1Gi
+        automountServiceAccountToken: false
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
