@@ -102,31 +102,52 @@
                 </ul>
               </li>
               <li class="-mx-6 mt-auto">
-                <a href="#" class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-blue-800">
-                  <component :is="UserCircleIcon" class="h-8 w-8"></component>
-                  <span class="sr-only">Your profile</span>
-                  <span class="truncate" aria-hidden="true">{{auth.login}}</span>
-                </a>
+                <div class="relative group">
+                    <div>
+                      <a href="#" class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-blue-800">
+                        <component :is="UserCircleIcon" class="h-8 w-8"></component>
+                        <span class="sr-only">Your profile</span>
+                        <span class="truncate" aria-hidden="true">{{auth.login}}</span>
+                        <svg class="-mr-1 h-5 w-5 text-gray-400 text-white" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                          <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                        </svg>
+                      </a>
+                  </div>
+                  <div style="transform: translate(-15px, -100px);" class="hidden group-hover:block absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+                    <div class="py-1" role="none">
+                      <a href="#" class="hover:bg-slate-300 block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" @click="auth.logout()" id="menu-item-2">Logout</a>
+                    </div>
+                  </div>
+                </div>
               </li>
             </ul>
           </nav>
         </div>
       </div>
   
-      <div class="sticky top-0 z-40 flex items-center gap-x-6 bg-blue-900 px-4 py-4 shadow-sm sm:px-6 lg:hidden">
+      <div class="sticky top-0 z-40 flex items-center gap-x-6 bg-blue-900 px-4 shadow-sm sm:px-6 lg:hidden">
         <button type="button" class="-m-2.5 p-2.5 text-gray-400 lg:hidden" @click="sidebarOpen = true">
           <span class="sr-only">Open sidebar</span>
           <Bars3Icon class="h-6 w-6" aria-hidden="true" />
         </button>
         <div class="flex-1 text-sm font-semibold leading-6 text-white">Menu</div>
-        <a href="#" class="text-white">
-          <div class="flex">
-            <span class="sr-only">Your profile</span>
-            <component :is="UserCircleIcon" class="h-8 w-8"></component>
-            <span class="sr-only">Your profile</span>
-            <span class="truncate" aria-hidden="true">{{auth.login}}</span>
+        <div class="relative group">
+          <div>
+            <a href="#" class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-blue-800">
+              <component :is="UserCircleIcon" class="h-8 w-8"></component>
+              <span class="sr-only">Your profile</span>
+              <span class="truncate" aria-hidden="true">{{auth.login}}</span>
+              <svg class="-mr-1 h-5 w-5 text-gray-400 text-white" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+              </svg>
+            </a>
           </div>
-        </a>
+          <div style="transform: translate(0px, -15px);" class="hidden group-hover:block absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+            <div class="py-1" role="none">
+              <a href="#" class="hover:bg-slate-300 block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" @click="auth.logout()" id="menu-item-2">Logout</a>
+            </div>
+          </div>
+        </div>
       </div>
   
       <main class="lg:pl-72">
