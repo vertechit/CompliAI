@@ -176,6 +176,24 @@ onMounted(scrollToBottom);
   border-radius: 5px;
 }
 
+.message_response blockquote{
+  margin: 1rem;
+  padding-left: 0.5rem;
+  border-left: 4px solid #dadada;
+  color: #dadada;
+}
+
+.message_response a{
+  color: -webkit-link;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.message_response hr{
+  border-width: 1px;
+  margin: 5px 0px;
+}
+
 .message_response ol {
   display: block;
   list-style-type: decimal;
@@ -198,7 +216,7 @@ onMounted(scrollToBottom);
     list-style-type: disc;
     margin-inline-start: 0px;
     margin-inline-end: 0px;
-    padding-inline-start: 40px;
+    padding-inline-start: 20px;
     unicode-bidi: isolate;
 }
 
