@@ -9,9 +9,9 @@
       <!-- <p v-else-if="message.type === 'response'" class="rounded-lg p-2 bg-blue-800 text-sm leading-6 text-white inline-block">
         {{ displayedTexts[index] }}
       </p> -->
-      <ContentRenderer v-else-if="message.type === 'response'" class="rounded-lg p-2 bg-blue-800 text-sm leading-6 text-white inline-block" :value="displayedTexts[index]"/>
+      <ContentRenderer v-else-if="message.type === 'response'" class="message_response rounded-lg p-2 bg-blue-500 text-sm leading-6 text-white inline-block" :value="displayedTexts[index]"/>
 
-      <div v-else class="text-sm leading-6 bg-gray-600 rounded-lg text-white p-2 float-end inline-block">{{ message.message }}</div>
+      <div v-else class="text-sm leading-6 bg-gray-500 rounded-lg text-white p-2 float-end inline-block">{{ message.message }}</div>
       <!-- <ContentRenderer v-else class="rounded-lg p-2 bg-blue-800 text-sm leading-6 text-white inline-block" :value="markdon"/> -->
 
     </div>

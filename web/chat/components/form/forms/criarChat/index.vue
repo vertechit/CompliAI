@@ -28,7 +28,7 @@ const emit = defineEmits(['close'])
 const props = defineProps({
     clearForm: Boolean,
     submitForm: Boolean,
-    chatList: [] as ChatSession[]
+    chatList: Array
 })
 
 const setLoading = (loading:boolean) => {
@@ -48,13 +48,14 @@ watch(() => props.submitForm, async() => {
         try{
             const retorno = await $fetch('/api/chatsession/create', {
             method: 'POST',
+            timeout: 300000,
             headers: {
                 "Authorization" :"bearer "+auth.token
             },
             body: {
                 "pergunta": form.value.pergunta
                 }
-            })
+            }) as ChatSession
         notificationStore.successNotification(null,'Chat criado com sucesso!')
         emit('close')
         props.chatList.unshift(retorno)

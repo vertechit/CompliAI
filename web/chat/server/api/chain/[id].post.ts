@@ -10,7 +10,7 @@ export default defineEventHandler(async (e) => {
       const data = await $fetch(`/graph/${id}`, {
          baseURL: baseURL,
          method: 'POST',
-         timeout: 1000000,
+         timeout: 300000,
          headers: {
             'Authorization': token+''
          },

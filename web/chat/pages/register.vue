@@ -80,12 +80,12 @@ const handleSubmit = async () => {
     try {
         if(password==passwordConfirm){
             await auth.register(email, password)
-            await navigateTo('/login')
+            await navigateTo('/login?successMessage=Usuário cadastrado com sucesso!')
         }else{
             errorMessage.value = 'Senha não está igual a confirmação da senha, verifique.'    
         }
     } catch (error) {
-        errorMessage.value = 'Erro no login. Verifique suas credenciais.'
+        errorMessage.value = 'Erro ao tentar criar usuário'
     }
 };
 

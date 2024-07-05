@@ -1,6 +1,15 @@
 <template>
     <div class="container-main">
         <div class="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+            <div v-if="successMessage" class="flex justify-center sm:mx-auto sm:w-full sm:max-w-sm space-x-3 items-center p-4 mb-4 text-sm text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800" role="alert">
+                <svg class="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                </svg>
+                <span class="sr-only">Info</span>
+                <div>
+                    <span class="font-medium">Sucesso!</span> {{successMessage}}
+                </div>
+            </div>
             <div class="flex justify-center sm:mx-auto sm:w-full sm:max-w-sm space-x-3">
                 <img class="h-14 w-auto" src="~/assets/img/logo.png" alt="Compliance Soluções" />
                  <!-- <Icon name="ri:robot-2-line" class="h-14 w-14 text-sky-500" color=""> </Icon> -->
@@ -41,6 +50,14 @@
                         focus-visible:outline-2 focus-visible:outline-offset-2 
                         focus-visible:outline-blue-700">Entrar</button>
                     </div>
+
+                    <div class="mt-2">
+                        <button type="submit" @click="registrar" class="flex 
+                        w-full justify-center rounded-lg bg-white 
+                        p-1  text-sm font-semibold leading-6
+                        text-blue-600 border border-blue-600 shadow-sm hover:shadow-md hover:border-blue-800 hover:text-blue-800">Registrar</button>
+                    </div>
+
                     <div class="text-red-500">{{ errorMessage }}</div>
                   
                 </div>
@@ -61,6 +78,7 @@ let email = '';
 let password = '';
 const route = useRoute();
 const errorMessage = ref(route.query.message);
+const successMessage = ref(route.query.successMessage);
 const auth = authStore()
 await auth.logout()
 
@@ -70,6 +88,13 @@ const handleSubmit = async () => {
         await navigateTo('/home')
     } catch (error) {
         errorMessage.value = 'Erro no login. Verifique suas credenciais.'
+    }
+};
+
+const registrar = async () => {
+    try {
+        await navigateTo('/register')
+    } catch (error) {
     }
 };
 

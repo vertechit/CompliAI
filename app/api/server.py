@@ -12,6 +12,8 @@ from api.auth import CurrentUser, create_access_token, Token, ACCESS_TOKEN_EXPIR
 from datetime import timedelta
 from agents.agent import graph
 from controllers.ChatHistoryController import insert_history
+from datetime import datetime
+
 
 tags_metadata = [
     {"name": "LLMs", "description": "Chamadas para as LLMs"},
@@ -66,6 +68,9 @@ def llm_chain_retriever_hist_title_api(current_user: Annotated[CurrentUser, Depe
 
 @app.post("/graph/{session_id}", tags=["LLMs"])
 def graph_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], session_id: int, chat: InputChat)-> ResponseChat:
+    data_hora_atual = datetime.now()
+    data_hora_formatada = data_hora_atual.strftime('%Y-%m-%d %H:%M:%S')
+    print('ENTROU GRAPH '+data_hora_formatada)
     insert_history(session_id=session_id, mensagem=chat.HumamMessage, tipo=1)
     ret = graph.invoke({
         "messages": [
@@ -74,6 +79,9 @@ def graph_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], s
         })
     insert_history(session_id=session_id, mensagem=ret['messages'][-1].content, tipo=2)
     response = ResponseChat(AiMessage=ret['messages'][-1].content)
+    data_hora_atual = datetime.now()
+    data_hora_formatada = data_hora_atual.strftime('%Y-%m-%d %H:%M:%S')
+    print('FINALIZOU GRAPH '+data_hora_formatada)
     return response
 
 # APIS de Documentos
