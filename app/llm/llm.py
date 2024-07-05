@@ -61,7 +61,7 @@ def chain_titulo(input: str) -> str:
     template =[
         (
             "system",
-            "Baseado na mensagem a seguir monte um titulo bem simplificado sobre a intenção da mensagem, mostre apenas o titulo, sem aspas"
+            "Baseado na mensagem a seguir monte um titulo bem simplificado sobre a intenção da mensagem, mostre apenas o titulo. NUNCA GERE ASPAS DUPLAS"
         ),
         (
             "human",
@@ -70,7 +70,7 @@ def chain_titulo(input: str) -> str:
     ]
     prompt = ChatPromptTemplate.from_messages(template)
     chain = (prompt | model | _output_parser)
-    return chain.invoke({"assunto":input})
+    return chain.invoke({"assunto":input}).replace('"', '')
 
 def chain(input: str) -> str:
     prompt = ChatPromptTemplate.from_template("{assunto}")

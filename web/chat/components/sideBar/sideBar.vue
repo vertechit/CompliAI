@@ -105,7 +105,7 @@
                 <a href="#" class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-blue-800">
                   <component :is="UserCircleIcon" class="h-8 w-8"></component>
                   <span class="sr-only">Your profile</span>
-                  <span aria-hidden="true">{{auth.login}}</span>
+                  <span class="truncate" aria-hidden="true">{{auth.login}}</span>
                 </a>
               </li>
             </ul>
@@ -124,7 +124,7 @@
             <span class="sr-only">Your profile</span>
             <component :is="UserCircleIcon" class="h-8 w-8"></component>
             <span class="sr-only">Your profile</span>
-            <span aria-hidden="true">{{auth.login}}</span>
+            <span class="truncate" aria-hidden="true">{{auth.login}}</span>
           </div>
         </a>
       </div>

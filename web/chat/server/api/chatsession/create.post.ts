@@ -15,7 +15,7 @@ export default defineEventHandler(async (e) => {
             body: {
                 "Pergunta": pergunta
             },
-            timeout: 10000,
+            timeout: 300000,
         });
         return retorno
 

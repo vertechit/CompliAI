@@ -34,6 +34,17 @@ export const authStore = defineStore('authStore', {
           this.login = email
 
       },
+      async register(email: string, senha: string) {
+        
+        let result = await $fetch('/api/register',{
+            method:'POST',
+            body:{
+              username: email,
+              password: senha
+            }
+          })
+
+      },
       async logout(){
         this.token = null
         const tokenCookie = useCookie('token')

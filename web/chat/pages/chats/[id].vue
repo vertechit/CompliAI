@@ -62,7 +62,7 @@ if(result){
       MessagesModel.value.addDotsLoading()
       let result = await $fetch(`/api/chain/${chatId}`,{
         method:'POST',
-        timeout: 10000,
+        timeout: 300000,
         headers: {
           "Authorization" :"bearer "+auth.token
         },
@@ -101,3 +101,129 @@ const scrollToBottom = () => {
 onMounted(scrollToBottom);
 
 </script>
+
+<style>
+
+.message_response h1 {
+  display: block;
+    font-size: 2em;
+    margin-block-start: 0.67em;
+    margin-block-end: 0.67em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+    unicode-bidi: isolate;
+}
+
+.message_response h2 {
+  display: block;
+    font-size: 1.5em;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+    unicode-bidi: isolate;
+}
+
+.message_response h3 {
+  display: block;
+    font-size: 1.17em;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+    unicode-bidi: isolate;
+}
+
+.message_response h4 {
+  display: block;
+    margin-block-start: 1.33em;
+    margin-block-end: 1.33em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+    unicode-bidi: isolate;
+}
+
+.message_response h5 {
+  display: block;
+    font-size: 0.83em;
+    margin-block-start: 1.67em;
+    margin-block-end: 1.67em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+    unicode-bidi: isolate;
+}
+
+.message_response h6 {
+  display: block;
+    font-size: 0.67em;
+    margin-block-start: 2.33em;
+    margin-block-end: 2.33em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+    unicode-bidi: isolate;
+}
+
+.message_response code {
+  display: inline-block;
+  background-color: rgb(31, 31, 31);
+  padding: 5px 5px 5px 10px;
+  border-radius: 5px;
+}
+
+.message_response ol {
+  display: block;
+  list-style-type: decimal;
+  margin-block-start: .1em;
+  margin-block-end: .1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 20px;
+  unicode-bidi: isolate;
+}
+
+.message_response ol ul {
+  list-style-type: circle;
+    margin-block-start: 0px;
+    margin-block-end: 0px;
+}
+
+.message_response ul {
+  display: block;
+    list-style-type: disc;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 40px;
+    unicode-bidi: isolate;
+}
+
+.message_response table {
+  display: table;
+    border-collapse: separate;
+    box-sizing: border-box;
+    text-indent: initial;
+    unicode-bidi: isolate;
+    border: 2px solid #ccc;
+    border-spacing: 0px 0px;
+    margin: 5px;
+}
+
+.message_response table th, .message_response table td {
+  display: table-cell;
+  border: 1px solid #ccc;
+  border-spacing: 0px;
+  padding: 5px;
+}
+
+.message_response p code, .message_response li code {
+  padding: 0px 5px 0px 5px;
+  border-radius: 5px;
+  color: #DBD7CAEE;
+}
+
+</style>

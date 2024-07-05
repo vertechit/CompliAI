@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
+  
 
   //   <link rel="preconnect" href="https://fonts.googleapis.com">
   // <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -51,9 +52,21 @@ export default defineNuxtConfig({
 
   runtimeConfig:{
     public:{
-      baseURL:process.env.WEB_BASE_URL || ''
+      baseURL:process.env.WEB_BASE_URL || 'http://localhost:8080'
     }
   },
 
-  compatibilityDate: '2024-07-03'
+  compatibilityDate: '2024-07-03',
+  content: {
+    highlight: {
+      langs: [
+        'c',
+        'cpp',
+        'java',
+        'python'
+      ],
+      // Theme used in all color schemes.
+      theme: 'vitesse-dark',
+    }
+  }
 })
