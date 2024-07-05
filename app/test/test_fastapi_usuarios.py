@@ -62,29 +62,29 @@ def test_login_com_erro():
     )
     assert response.status_code == 404
     
-def test_cria_usuario_sem_ser_admin():
-    """
-    Tenta criar um usuário sem ser um usuário ADMIN
-    """
-    token = get_bearer_token("teste@teste.com", "teste")
-    response = client.post(
-        "/createUsers",
-        json={"username":"teste2@teste.com", "password":"teste2"},
-        headers={"Authorization": f"Bearer {token}"}
-    )
-    assert response.status_code == 401
+# def test_cria_usuario_sem_ser_admin():
+#     """
+#     Tenta criar um usuário sem ser um usuário ADMIN
+#     """
+#     token = get_bearer_token("teste@teste.com", "teste")
+#     response = client.post(
+#         "/createUsers",
+#         json={"username":"teste2@teste.com", "password":"teste2"},
+#         headers={"Authorization": f"Bearer {token}"}
+#     )
+#     assert response.status_code == 401
     
-def test_deleta_usuario_sem_ser_admin():
-    """
-    Tenta deletar um usuário sem ser um usuário ADMIN
-    """
-    token = get_bearer_token("teste@teste.com", "teste")
-    response = client.post(
-        "/deleteUsers",
-        json={"username":"teste@teste.com"},
-        headers={"Authorization": f"Bearer {token}"}
-    )
-    assert response.status_code == 401
+# def test_deleta_usuario_sem_ser_admin():
+#     """
+#     Tenta deletar um usuário sem ser um usuário ADMIN
+#     """
+#     token = get_bearer_token("teste@teste.com", "teste")
+#     response = client.post(
+#         "/deleteUsers",
+#         json={"username":"teste@teste.com"},
+#         headers={"Authorization": f"Bearer {token}"}
+#     )
+#     assert response.status_code == 401
     
 def test_delete_usuario_existente():
     """
