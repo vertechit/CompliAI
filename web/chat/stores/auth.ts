@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-
+import  { defaultStore } from './default'
 export const authStore = defineStore('authStore', {
     state: () => ({
       token: useCookie('token'),
@@ -7,8 +7,9 @@ export const authStore = defineStore('authStore', {
     }),
     actions: {
       async authenticate(email: string, senha: string) {
-        
-        let result = await $fetch('/api/login',{
+        try {
+          defaultStore().setLoading(true)
+          let result = await $fetch('/api/login',{
             method:'POST',
             body:{
               username: email,
@@ -33,6 +34,12 @@ export const authStore = defineStore('authStore', {
           this.token = result.access_token
           this.login = email
 
+        } catch (error) {
+          this.logout()
+        }finally{
+          defaultStore().setLoading(false)
+        }
+  
       },
       async register(email: string, senha: string) {
         
