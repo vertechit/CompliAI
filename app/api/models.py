@@ -25,6 +25,7 @@ class DocumentoObj(BaseModel):
     md5: str
     url: str | None
     user_id: int
+    folder_id: int
     chunks: List[ChunkObj]
 
 class SessaoObj(BaseModel):
@@ -51,3 +52,11 @@ class InputUser(BaseModel):
     
 class InputUsername(BaseModel):
     username: str
+
+class PastaObj(BaseModel):
+    folder_id: int
+    path: str
+    descr: str
+    user_id: int
+    created: datetime
+    ar_folder_id: int | None

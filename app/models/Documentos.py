@@ -1,6 +1,7 @@
 import peewee
 import os
 from models.User import User
+from models.Folders import Folders
 
 db = peewee.SqliteDatabase('example.db')
 
@@ -19,6 +20,8 @@ class Documentos(peewee.Model):
     arquivo = peewee.BlobField(null=True)
     url = peewee.CharField(null=True)
     user_id = peewee.ForeignKeyField(User, backref='user')
+    folder_id = peewee.ForeignKeyField(Folders, backref='folders')
+
     class Meta:
         database = db
         
