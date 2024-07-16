@@ -111,7 +111,7 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: api
-        image: devcst/compliai:latest
+        image: devcst/compliai:83
         resources:
           limits:
             memory: 1Gi
@@ -184,7 +184,7 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: webchat
-        image: devcst/compliaiweb:latest
+        image: devcst/compliaiweb:85
         resources:
           limits:
             memory: 1Gi
@@ -193,7 +193,7 @@ spec:
         - containerPort: 3000
         env:
         - name: NUXT_PUBLIC_BASE_URL
-          value: http://backend-svc.compliai.svc.cluster.local:8082
+          value: http://api-svc.compliai.svc.cluster.local:8082
 ---
 apiVersion: v1
 kind: Service
@@ -246,7 +246,7 @@ spec:
   selector:
     app: frontend
   ports:
-    - port: 8081
+    - port: 8080
       targetPort: 3000
       name: frontend
   type: ClusterIP
@@ -254,8 +254,8 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: nsi-external-svc
-  namespace: default
+  name: compliai-external-svc
+  namespace: dev
 spec:
   type: ExternalName
-  externalName: compliai-svc.compliai.svc.cluster.local
+  externalName: frontend-svc.compliai.svc.cluster.local

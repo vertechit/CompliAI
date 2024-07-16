@@ -10,7 +10,8 @@ from api.models import InputPergunta, InputChat, ChunkObj, InputDocumentoApi, Do
 from utils.utils import destroyDatabases, initDatabases
 from api.auth import CurrentUser, create_access_token, Token, ACCESS_TOKEN_EXPIRE_MINUTES, validade_admin_user, get_current_user
 from datetime import timedelta
-from agents.agent import graph
+# from agents.agent import graph
+from agents.formulas.agent import graph
 from controllers.ChatHistoryController import insert_history
 from datetime import datetime
 

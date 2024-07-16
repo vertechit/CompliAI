@@ -63,7 +63,8 @@ export default defineNuxtConfig({
         'c',
         'cpp',
         'java',
-        'python'
+        'python',
+        'sql'
       ],
       // Theme used in all color schemes.
       theme: 'vitesse-dark',
