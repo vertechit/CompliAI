@@ -98,14 +98,15 @@ def lista_documentos_api(current_user: Annotated[CurrentUser, Depends(get_curren
     return ret
 
 @app.get("/listDocument/{documento_id}", tags=["Documentos"])
-def lista_documento_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], folder_id: int, documento_id: int = None)-> DocumentoObj | None:
+def lista_documento_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], documento_id: int = None)-> DocumentoObj | None:
     ret: Optional[DocumentoObj] = None
-    documentos = list_documents(documento_id, current_user.user_id, folder_id)
+    documentos = list_documents(documento_id, current_user.user_id)
     if len(documentos) == 0:
         return None
     for doc in documentos:
-        chunk = [ChunkObj(chunks_id=chunkLoop[0], id_vector=chunkLoop[1], md5=chunkLoop[2], conteudo=chunkLoop[3]) for chunkLoop in doc[6]]
-        ret = DocumentoObj(documento_id=doc[0], titulo=doc[1], descricao=doc[2], md5=doc[3], url=doc[4], user_id=doc[5].user_id, folder_id=doc[6], chunks=chunk)
+        print(doc)
+        chunk = [ChunkObj(chunks_id=chunkLoop[0], id_vector=chunkLoop[1], md5=chunkLoop[2], conteudo=chunkLoop[3]) for chunkLoop in doc[7]]
+        ret = DocumentoObj(documento_id=doc[0], titulo=doc[1], descricao=doc[2], md5=doc[3], url=doc[4], user_id=doc[5].user_id, folder_id=doc[6].folder_id, chunks=chunk)
     return ret
 
 @app.post("/createDocument/", tags=["Documentos"])
@@ -115,8 +116,8 @@ async def upload_file_api(current_user: Annotated[CurrentUser, Depends(get_curre
     return {"retorno": documento}
 
 @app.post("/createDocumentUrl/", tags=["Documentos"])
-def upload_file_url_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], documento: InputDocumentoApi, folder_id: int):
-    documento = save_document(documento.url, documento.titulo, documento.description, current_user.user_id, folder_id)
+def upload_file_url_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], documento: InputDocumentoApi):
+    documento = save_document(documento.url, documento.titulo, documento.description, current_user.user_id, documento.folder_id)
     return {"retorno": documento}
 
 @app.delete("/deleteDocument/{documento_id}", tags=["Documentos"])
@@ -221,13 +222,13 @@ def lista_pastas_api(current_user: Annotated[CurrentUser, Depends(get_current_us
     return ret
 
 @app.get("/listFolder/{folder_id}", tags=["Pastas"])
-def lista_pasta_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], folder_id: int = None)-> List[PastaObj] | None:
+def lista_pasta_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], folder_id: int = None)-> PastaObj | None:
     ret: List[PastaObj] = []
     pastas = list_folders(folder_id, current_user.user_id)
     if len(pastas) == 0:
         return None
     for folder in pastas:
-        ret.append(PastaObj(folder_id=folder[0], path=folder[1], descr=folder[2], user_id=folder[3].user_id, created=folder[4], ar_folder_id=folder[5]))
+        ret = PastaObj(folder_id=folder[0], path=folder[1], descr=folder[2], user_id=folder[3].user_id, created=folder[4], ar_folder_id=folder[5])
     return ret
 
 @app.post("/createFolder/", tags=["Pastas"])

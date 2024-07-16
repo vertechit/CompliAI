@@ -1,10 +1,10 @@
 from models.Folders import Folders, FolderPermissions
 from models.Documentos import Documentos
-from controllers.DocumentsController import delete_document
+# from controllers.DocumentsController import delete_document
 from typing import List
 import os
 
-def create_folder(path: str, descr: str, user_id: int, ar_folder_id: int) -> str:
+def create_folder(path: str, descr: str, user_id: int, ar_folder_id: int | None) -> str:
     if path == None:
         return 'Erro: Não foi possível realizar a criação da pasta pois o diretório da pasta não foi definido!'
     elif descr == None:
@@ -72,7 +72,8 @@ def delete_folder(p_folder_id: int, user_id: int) -> str:
     
     if docs is not None:
         for doc in docs:
-            delete_document(doc, user_id)
+            pass
+            # delete_document(doc, user_id) # Estava dando erro de Chamada em LOOP por isso foi comentado, mas é preciso verificar depois
 
     # Deleta as pastas
     FolderPermissions.delete().where(FolderPermissions.folder_id.in_(tuple(lista_sem_duplicatas))).execute()
@@ -98,9 +99,9 @@ def list_folders(folder_id: int = None, user_id: int = None) -> List[Folders]:
     folders = None
     array   = []
     if folder_id == 0:
-        folders = Folders.select().where((Folders.user_id == user_id) & (Folders.ar_folder_id == None))
+        folders = Folders.select().where((Folders.user_id == user_id))
     else:
-        folders = Folders.select().where((Folders.ar_folder_id == folder_id))
+        folders = Folders.select().where((Folders.folder_id == folder_id))
     for folder in folders:
         newFolder = (folder.folder_id, folder.path, folder.descr, folder.user_id, folder.created, folder.ar_folder_id)
         array.append(newFolder)

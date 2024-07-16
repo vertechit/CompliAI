@@ -50,13 +50,16 @@ def delete_document(documento_id: int, user_id: int)-> str:
         Documentos.delete().where(Documentos.documento_id==documento_id).execute()
         return "Documento deletado" 
 
-def list_documents(documento_id: int, user_id: int, folder_id: int)-> List[Documentos]:
+def list_documents(documento_id: int, user_id: int, folder_id: int | None = None)-> List[Documentos]:
     docs = None
     array = []
     if documento_id==0:
         docs = Documentos.select().where((Documentos.user_id == user_id) & (Documentos.folder_id == folder_id))
     else:
-        docs = Documentos.select().where((Documentos.documento_id==documento_id) & (Documentos.user_id == user_id) & (Documentos.folder_id == folder_id))
+        if folder_id == None:
+            docs = Documentos.select().where((Documentos.documento_id==documento_id) & (Documentos.user_id == user_id))
+        else:
+            docs = Documentos.select().where((Documentos.documento_id==documento_id) & (Documentos.user_id == user_id) & (Documentos.folder_id == folder_id))
     for doc in docs:
         newDoc = (doc.documento_id, doc.titulo, doc.descricao, doc.md5, doc.url, doc.user_id, doc.folder_id, [(chunk.chunks_id, chunk.id_vector, chunk.md5, chunk.conteudo) for chunk in doc.chunks])
         array.append(newDoc)

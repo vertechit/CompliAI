@@ -8,7 +8,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.documents.base import Document
 from typing import List
 from models import ChatHistory, Documentos, User, Folders
-from controllers import UserController
+from controllers import UserController, FoldersController
 from vectors import vectorStore
 from bs4 import SoupStrainer
 
@@ -44,6 +44,7 @@ def initDatabases():
         Folders.Folders.create_table()
     if not Folders.FolderPermissions.table_exists():
         Folders.FolderPermissions.create_table()
+        FoldersController.create_folder('/', 'main', 1, None)
     if not Documentos.Documentos.table_exists():
         Documentos.Documentos.create_table()
     if not Documentos.Chunks.table_exists():

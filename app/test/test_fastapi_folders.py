@@ -47,9 +47,8 @@ def test_lista_unica_pasta():
     Teste para retornar o conteúdo de uma única pasta passando {folder_id} como parâmetro
     O retorno deve ser nulo pois a pasta está vazia
     """
-    response = client.post(
-        '/listFolder/',
-        params={"folder_id": "1"},
+    response = client.get(
+        '/listFolder/1',
         headers={"Authorization": f"Bearer {get_bearer_token()}"}
     )
     assert response.status_code == 200
