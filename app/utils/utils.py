@@ -44,7 +44,8 @@ def initDatabases():
         Folders.Folders.create_table()
     if not Folders.FolderPermissions.table_exists():
         Folders.FolderPermissions.create_table()
-        FoldersController.create_folder('/', 'main', 1, None)
+        new_folder = Folders.Folders(path='/', descr='main', user_id=1)
+        new_folder.save()
     if not Documentos.Documentos.table_exists():
         Documentos.Documentos.create_table()
     if not Documentos.Chunks.table_exists():

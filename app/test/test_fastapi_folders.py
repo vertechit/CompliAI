@@ -23,11 +23,11 @@ def test_cria_pasta():
     """
     response = client.post(
         "/createFolder",
-        params={"path": "/", "descr": "main"},
+        params={"path": "/pasta1", "descr": "Pasta1"},
         headers={"Authorization": f"Bearer {get_bearer_token()}"}
     )
     assert response.status_code == 200
-    assert response.json() == {'retorno': 'Pasta main criada com sucesso!'}
+    assert response.json() == {'retorno': 'Pasta Pasta1 criada com sucesso!'}
 
 def test_cria_pasta_ja_existente():
     """

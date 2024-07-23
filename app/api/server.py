@@ -93,8 +93,8 @@ def lista_documentos_api(current_user: Annotated[CurrentUser, Depends(get_curren
     if len(documentos) == 0:
         return None
     for doc in documentos:
-        chunk = [ChunkObj(chunks_id=chunkLoop[0], id_vector=chunkLoop[1], md5=chunkLoop[2], conteudo=chunkLoop[3]) for chunkLoop in doc[6]]
-        ret.append(DocumentoObj(documento_id=doc[0], titulo=doc[1], descricao=doc[2], md5=doc[3], url=doc[4], user_id=doc[5].user_id, folder_id=doc[6], chunks=chunk))
+        chunk = [ChunkObj(chunks_id=chunkLoop[0], id_vector=chunkLoop[1], md5=chunkLoop[2], conteudo=chunkLoop[3]) for chunkLoop in doc[7]]
+        ret.append(DocumentoObj(documento_id=doc[0], titulo=doc[1], descricao=doc[2], md5=doc[3], url=doc[4], user_id=doc[5].user_id, folder_id=doc[6].folder_id, chunks=chunk))
     return ret
 
 @app.get("/listDocument/{documento_id}", tags=["Documentos"])
