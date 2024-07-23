@@ -8,7 +8,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.documents.base import Document
 from typing import List
 from models import ChatHistory, Documentos, User, Folders
-from controllers import UserController, FoldersController
+from controllers import UserController
 from vectors import vectorStore
 from bs4 import SoupStrainer
 
@@ -42,6 +42,8 @@ def initDatabases():
         ChatHistory.ChatHistory.create_table()
     if not Folders.Folders.table_exists():
         Folders.Folders.create_table()
+        new_folder = Folders.Folders(path='/', descr='main', user_id=1)
+        new_folder.save()
     if not Folders.FolderPermissions.table_exists():
         Folders.FolderPermissions.create_table()
         new_folder = Folders.Folders(path='/', descr='main', user_id=1)
@@ -84,5 +86,5 @@ def getDocuments(filepath: str)->List[Document]:
             }
         document = WebBaseLoader(filepath, bs_kwargs=bskwarg).load()
         document = text_splitter.split_documents(document)
-    
+
     return(document)
