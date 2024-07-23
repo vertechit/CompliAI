@@ -38,6 +38,7 @@ class InputDocumentoApi(BaseModel):
     titulo: str | None
     description: str
     url: str | None
+    folder_id: int
 
 class HistoricoObj(BaseModel):
     chathistory_id: int
@@ -98,3 +99,8 @@ class PastaPermissionObj(BaseModel):
     created: datetime
     ar_folder_id: int | None
     permissions: List[PermissionObj]
+    
+class PastaCreateObj(BaseModel):
+    path: str
+    descr: str
+    ar_folder_id: int | None

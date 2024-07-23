@@ -64,7 +64,7 @@ def delete_folder(p_folder_id: int, user_id: int) -> str:
                     x += 1
                     rowcount_ant = rowcount_atu
 
-        descr = Folders.select(Folders.descr).where(Folders.folder_id == p_folder_id)
+        descr = Folders.select().where(Folders.folder_id == p_folder_id).first()
         lista_sem_duplicatas = list(set(list_ids))
 
         # Deleta Documentos
@@ -82,7 +82,7 @@ def delete_folder(p_folder_id: int, user_id: int) -> str:
         Folders.delete().where(Folders.folder_id.in_(tuple(lista_sem_duplicatas))).execute()
 
         if len(lista_sem_duplicatas) == 1:
-            return f'Pasta {descr} deletada.'
+            return f'Pasta {descr.descr} deletada.'
         elif len(lista_sem_duplicatas) >= 1:
             return f'{len(lista_sem_duplicatas)} pastas foram deletadas.'
         else:
@@ -92,13 +92,13 @@ def rename_folder(folder_id: int, descr: str) -> str:
     if folder_id == 1:
         return 'Não é possível renomear a pasta Main'
     else:
-        folder = Folders.select(Folders.folder_id).where((Folders.folder_id == folder_id))
+        folder = Folders.select(Folders.folder_id).where((Folders.folder_id == folder_id)).first()
         if folder.get() == None:
             return 'Pasta não localizada!'
         else:
-            descr_ant = Folders.select(Folders.descr).where((Folders.folder_id == folder_id))
+            descr_ant = Folders.select().where((Folders.folder_id == folder_id)).first()
             Folders.update({Folders.descr: descr}).where((Folders.folder_id == folder_id)).execute()
-            return f'Nome da pasta alterado de {descr_ant} para {descr}'
+            return f'Nome da pasta alterado de {descr_ant.descr} para {descr}'
 
 def list_folders(folder_id: int, user_id: int = None) -> List[Folders]:
     folderPai = None

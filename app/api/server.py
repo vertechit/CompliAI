@@ -7,7 +7,7 @@ from controllers.ChatHistoryController import get_chat_history_by_session
 from controllers.UserController import create_user, login, delete_user
 from controllers.FoldersController import create_folder, delete_folder, list_folders, rename_folder, give_permission, delete_permission, list_permission
 from typing import List, Annotated, Optional
-from api.models import InputPergunta, InputChat, ChunkObj, InputDocumentoApi, DocumentoObj, ResponseChat, SessaoObj, HistoricoObj, InputUser, InputUsername, PastaObj, PastaFilhoObj, DocumentoFilhoObj, ContentsFilhoObj, PastaPermissionObj, PermissionObj
+from api.models import PastaCreateObj, InputPergunta, InputChat, ChunkObj, InputDocumentoApi, DocumentoObj, ResponseChat, SessaoObj, HistoricoObj, InputUser, InputUsername, PastaObj, PastaFilhoObj, DocumentoFilhoObj, ContentsFilhoObj, PastaPermissionObj, PermissionObj
 from utils.utils import destroyDatabases, initDatabases
 from api.auth import CurrentUser, create_access_token, Token, ACCESS_TOKEN_EXPIRE_MINUTES, validade_admin_user, get_current_user
 from datetime import timedelta
@@ -98,14 +98,14 @@ def lista_documentos_api(current_user: Annotated[CurrentUser, Depends(get_curren
     return ret
 
 @app.get("/listDocument/{documento_id}", tags=["Documentos"])
-def lista_documento_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], folder_id: int, documento_id: int = None)-> DocumentoObj | None:
+def lista_documento_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], documento_id: int = None)-> DocumentoObj | None:
     ret: Optional[DocumentoObj] = None
-    documentos = list_documents(documento_id, current_user.user_id, folder_id)
+    documentos = list_documents(documento_id, current_user.user_id)
     if len(documentos) == 0:
         return None
     for doc in documentos:
         chunk = [ChunkObj(chunks_id=chunkLoop[0], id_vector=chunkLoop[1], md5=chunkLoop[2], conteudo=chunkLoop[3]) for chunkLoop in doc[7]]
-        ret = DocumentoObj(documento_id=doc[0], titulo=doc[1], descricao=doc[2], md5=doc[3], url=doc[4], user_id=doc[5].user_id, folder_id=doc[6], chunks=chunk)
+        ret = DocumentoObj(documento_id=doc[0], titulo=doc[1], descricao=doc[2], md5=doc[3], url=doc[4], user_id=doc[5].user_id, folder_id=doc[6].folder_id, chunks=chunk)
     return ret
 
 @app.post("/createDocument/", tags=["Documentos"])
@@ -115,8 +115,8 @@ async def upload_file_api(current_user: Annotated[CurrentUser, Depends(get_curre
     return {"retorno": documento}
 
 @app.post("/createDocumentUrl/", tags=["Documentos"])
-def upload_file_url_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], documento: InputDocumentoApi, folder_id: int):
-    documento = save_document(documento.url, documento.titulo, documento.description, current_user.user_id, folder_id)
+def upload_file_url_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], documento: InputDocumentoApi):
+    documento = save_document(documento.url, documento.titulo, documento.description, current_user.user_id, documento.folder_id)
     return {"retorno": documento}
 
 @app.delete("/deleteDocument/{documento_id}", tags=["Documentos"])
@@ -224,7 +224,7 @@ def lista_pastas_api(current_user: Annotated[CurrentUser, Depends(get_current_us
     return ret
 
 @app.get("/listFolder/{folder_id}", tags=["Pastas"])
-def lista_pasta_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], folder_id: int)-> List[PastaObj] | None:
+def lista_pasta_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], folder_id: int)-> PastaObj | None:
     ret: List[PastaObj] = []
     pastas = list_folders(folder_id, current_user.user_id)
     if len(pastas) == 0:
@@ -234,11 +234,11 @@ def lista_pasta_api(current_user: Annotated[CurrentUser, Depends(get_current_use
         docfi = [DocumentoFilhoObj(documento_id=docloop[0], titulo=docloop[1], descricao=docloop[2], md5=docloop[3], url=docloop[4], user_id=docloop[5].user_id, folder_id=docloop[6]) for docloop in folder[7]]
         contentfi = ContentsFilhoObj(documents = docfi, folders = pastafi)
         ret.append(PastaObj(folder_id=folder[0], path=folder[1], descr=folder[2], user_id=folder[3].user_id, created=folder[4], ar_folder_id=folder[5], contents=contentfi))
-    return ret
+    return ret[0]
 
 @app.post("/createFolder/", tags=["Pastas"])
-async def create_folder_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], path: str, descr: str, ar_folder_id: int):
-    pasta = create_folder(path, descr, current_user.user_id, ar_folder_id)
+async def create_folder_api(current_user: Annotated[CurrentUser, Depends(get_current_user)], pasta: PastaCreateObj):
+    pasta = create_folder(pasta.path, pasta.descr, current_user.user_id, pasta.ar_folder_id)
     return {"retorno": pasta}
 
 @app.put("/renameFolder/", tags=["Pastas"])

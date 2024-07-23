@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 from api import server
 from datetime import datetime
+from types import NoneType
 import logging
 
 LOGGER = logging.getLogger(__name__)
@@ -23,7 +24,7 @@ def test_cria_pasta():
     """
     response = client.post(
         "/createFolder",
-        params={"path": "/pasta1", "descr": "Pasta1"},
+        json={"path": "/pasta1", "descr": "Pasta1", "ar_folder_id": 1},
         headers={"Authorization": f"Bearer {get_bearer_token()}"}
     )
     assert response.status_code == 200
@@ -36,7 +37,7 @@ def test_cria_pasta_ja_existente():
     """
     response = client.post(
         '/createFolder',
-        params={"path": "/", "descr": "main"},
+        json={"path": "/pasta1", "descr": "Pasta1", "ar_folder_id": 1},
         headers={"Authorization": f"Bearer {get_bearer_token()}"}
     )
     assert response.status_code == 200
@@ -52,7 +53,13 @@ def test_lista_unica_pasta():
         headers={"Authorization": f"Bearer {get_bearer_token()}"}
     )
     assert response.status_code == 200
-    assert response.json() == {'null'}
+    resp_obj = response.json()
+    assert isinstance(resp_obj['folder_id'], int)
+    assert isinstance(resp_obj['path'], str)
+    assert isinstance(resp_obj['descr'], str)
+    assert isinstance(resp_obj['user_id'], int)
+    assert isinstance(resp_obj['created'], str)
+    assert isinstance(resp_obj['ar_folder_id'], NoneType)
 
 def test_lista_pastas():
     """
@@ -69,21 +76,21 @@ def test_lista_pastas():
     assert isinstance(resp_obj['path'], str)
     assert isinstance(resp_obj['descr'], str)
     assert isinstance(resp_obj['user_id'], int)
-    assert isinstance(resp_obj['created'], datetime)
-    assert isinstance(resp_obj['ar_folder_id'], int)
+    assert isinstance(resp_obj['created'], str)
+    assert isinstance(resp_obj['ar_folder_id'], int | NoneType)
 
 def test_renomeia_pasta():
     """
     Teste para renomear uma única pasta passando {folder_id} como parâmetro
     O retorno deve ser {"retorno": "Nome da pasta alterado de {descr} para {p_descr}"}
     """
-    response = client.post(
+    response = client.put(
         '/renameFolder/',
-        params={"folder_id": "1", "descr": "main2"},
+        params={"folder_id": "2", "descr": "Pasta2"},
         headers={"Authorization": f"Bearer {get_bearer_token()}"}
     )
     assert response.status_code == 200
-    assert response.json() == {'retorno': 'Nome da pasta alterado de main para main2'}
+    assert response.json() == {'retorno': 'Nome da pasta alterado de main para Pasta2'}
 
 def test_deleta_pasta():
     """
@@ -92,8 +99,8 @@ def test_deleta_pasta():
     """
     token = get_bearer_token()
     response = client.delete(
-        "/deleteFolder/1",
+        "/deleteFolder/2",
         headers={"Authorization": f"Bearer {token}"}
     )
     assert response.status_code == 200
-    assert response.json() == {"retorno": "Pasta main2 deletada."}
+    assert response.json() == {"retorno": "Pasta Pasta2 deletada."}
