@@ -22,7 +22,7 @@ def test_cria_documento_file():
     """
     response = client.post(
         "/createDocument",
-        params={"description":"teste"},
+        params={"description":"teste", "folder_id": 1},
         files={"file": ("gympass.pdf", open('app/test/gympass.pdf', "rb"), "application/pdf")},
         headers={"Authorization": f"Bearer {get_bearer_token()}"}
     )
@@ -49,7 +49,7 @@ def test_cria_documento_url():
     """
     response = client.post(
         "/createDocumentUrl",
-        json={"titulo":"teste", "description":"teste","url":"https://docs.compliancecapitalhumano.com.br/docs/cor/000_rhgeral"},
+        json={"titulo":"teste", "description":"teste","url":"https://docs.compliancecapitalhumano.com.br/docs/cor/000_rhgeral", "folder_id": 1},
         headers={"Authorization": f"Bearer {get_bearer_token()}"}
     )
     assert response.status_code == 200
@@ -62,7 +62,7 @@ def test_cria_documento_ja_existente():
     """
     response = client.post(
         "/createDocumentUrl",
-        json={"titulo":"teste", "description":"teste","url":"https://docs.compliancecapitalhumano.com.br/docs/cor/000_rhgeral"},
+        json={"titulo":"teste", "description":"teste","url":"https://docs.compliancecapitalhumano.com.br/docs/cor/000_rhgeral", "folder_id": 1},
         headers={"Authorization": f"Bearer {get_bearer_token()}"}
     )
     assert response.status_code == 200
@@ -91,7 +91,7 @@ def test_lista_documentos():
     Teste para retorna todos os documentos cadastrados
     O retorno de deve ser um Array com vários JSONs com os campos do objeto de documentos
     """
-    response = client.get("/listDocument",
+    response = client.get("/listDocument?folder_id=1",
         headers={"Authorization": f"Bearer {get_bearer_token()}"})
     assert response.status_code == 200
     assert isinstance(response.json(), list)

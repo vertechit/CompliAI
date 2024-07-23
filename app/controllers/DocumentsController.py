@@ -6,7 +6,7 @@ import tempfile
 import hashlib
 import os
 
-def save_document(filepath: str | bytes, filename: str, descr: str, user_id: int)-> str:
+def save_document(filepath: str | bytes, filename: str, descr: str, user_id: int, folder_id: int)-> str:
     fileBytes = None
     md5file = None
     urlParam = None
@@ -23,7 +23,7 @@ def save_document(filepath: str | bytes, filename: str, descr: str, user_id: int
             f.write(fileBytes)
     docExists = Documentos.select().where(Documentos.md5==md5file).first()
     if docExists==None:
-        documento = Documentos(titulo=filename, descricao=descr, arquivo=fileBytes, md5=md5file, url=urlParam, user_id=user_id)
+        documento = Documentos(titulo=filename, descricao=descr, arquivo=fileBytes, md5=md5file, url=urlParam, user_id=user_id, folder_id=folder_id)
         documento.save()
         docs = getDocuments(final_path)
         for doc in docs:
@@ -50,14 +50,17 @@ def delete_document(documento_id: int, user_id: int)-> str:
         Documentos.delete().where(Documentos.documento_id==documento_id).execute()
         return "Documento deletado" 
 
-def list_documents(documento_id: int, user_id: int)-> List[Documentos]:
+def list_documents(documento_id: int, user_id: int, folder_id: int | None = None)-> List[Documentos]:
     docs = None
     array = []
     if documento_id==0:
-        docs = Documentos.select().where(Documentos.user_id == user_id)
+        docs = Documentos.select().where((Documentos.user_id == user_id) & (Documentos.folder_id == folder_id))
     else:
-        docs = Documentos.select().where((Documentos.documento_id==documento_id) & (Documentos.user_id == user_id))
+        if folder_id == None:
+            docs = Documentos.select().where((Documentos.documento_id==documento_id) & (Documentos.user_id == user_id))
+        else:
+            docs = Documentos.select().where((Documentos.documento_id==documento_id) & (Documentos.user_id == user_id) & (Documentos.folder_id == folder_id))
     for doc in docs:
-        newDoc = (doc.documento_id, doc.titulo, doc.descricao, doc.md5, doc.url, doc.user_id, [(chunk.chunks_id, chunk.id_vector, chunk.md5, chunk.conteudo) for chunk in doc.chunks])
+        newDoc = (doc.documento_id, doc.titulo, doc.descricao, doc.md5, doc.url, doc.user_id, doc.folder_id, [(chunk.chunks_id, chunk.id_vector, chunk.md5, chunk.conteudo) for chunk in doc.chunks])
         array.append(newDoc)
     return array
