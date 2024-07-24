@@ -22,6 +22,7 @@
   import FooterInputMensages from '@/components/footer/inputMensages.vue'
   import cMessages from '@/components/messages.vue'
   import {defaultStore} from '@/stores/default'
+  import { authStore} from '@/stores/auth';
   const route = useRoute()
   const auth = authStore()
   const chatContainer: Ref<HTMLElement | null> = ref(null);

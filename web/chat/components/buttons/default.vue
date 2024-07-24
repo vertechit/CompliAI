@@ -1,5 +1,6 @@
 <template>
     <button type="button" 
+    v-bind="$attrs"
     @click="emit('action')"
     class="rounded-md
        px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm
