@@ -192,7 +192,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import { PlusCircleIcon, UserCircleIcon } from '@heroicons/vue/20/solid';
 import { type ChatSession } from '@/models/Chatsession/List'
-
+import {useMyFetch} from '@/composables/useMyFetch'
 const submitForm = ref(false)
 const clearForm = ref(false)
 const forceGetList = ref(false)
@@ -217,11 +217,8 @@ const openDeleteDialog = async (value: number, titulo: string) => {
 }
 
 const deleteSesssion = async (value: number) => {
-  await $fetch(`/api/chatsession/${value}`,{
+  await useMyFetch(`/api/chatsession/${value}`,{
     method: "DELETE",
-    headers: {
-        "Authorization" :"bearer "+auth.token
-    }
   })
   await getSessions()
   await navigateTo('/home')
@@ -245,11 +242,8 @@ if (route.params.id){
 const getSessions = async () => {
   try{
      let retorno
-     retorno = await $fetch('/api/chatsession/list',{
+     retorno = await useMyFetch('/api/chatsession/list',{
       method: "GET",
-      headers: {
-        "Authorization" :"bearer "+auth.token
-      }
     }) as ChatSession[]
 
     chatList.value = retorno.reverse()

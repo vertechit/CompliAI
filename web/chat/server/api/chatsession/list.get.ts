@@ -1,19 +1,10 @@
-
-
+import {useMyFetchServer} from '@/composables/useMyFetchServer'
 export default defineEventHandler(async (e) => {
-
     try {
-       const token = getRequestHeader(e, 'Authorization');
-       const { baseURL}  = useRuntimeConfig().public
-       const data = await $fetch(`/listSession`, {
-          baseURL: baseURL,
+       const data = await useMyFetchServer(`/listSession`, {
           method: 'GET',
-          headers: {
-            'Authorization': token+''
-          },
           timeout: 10000,
-         
-       });
+       },e);
        return data || []
  
     } catch (error:any) {

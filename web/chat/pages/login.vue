@@ -78,30 +78,25 @@
                             @click="registrar"
                             custom="flex w-full justify-center rounded-lg bg-white
                             !py-1.5
+                            !text-black
                                  text-sm font-semibold leading-6 text-sm text-black font-semibold leading-6
                         text-blue-600 border border-blue-600 shadow-sm hover:shadow-md hover:border-blue-800 hover:text-blue-800" 
                             label="Registrar" 
 
                         />
-                        <!-- <button type="submit" @click="registrar"
-                            class="flex 
-                        w-full justify-center rounded-lg bg-white 
-                        p-1  text-sm font-semibold leading-6
-                        text-blue-600 border border-blue-600 shadow-sm hover:shadow-md hover:border-blue-800 hover:text-blue-800">Registrar</button> -->
                     </div>
-
                     <div class="text-red-500">{{ errorMessage }}</div>
-
                 </div>
             </div>
         </div>
     </div>
-
+    <Loader :loading="defaultPiniaStore.loading" />
 </template>
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import { authStore } from '@/stores/auth';
+import { defaultStore} from '@/stores/default';
 import ButtonsDefault from '@/components/buttons/default.vue'
 definePageMeta({
     layout: false,
@@ -113,10 +108,12 @@ const route = useRoute();
 const errorMessage = ref(route.query.message);
 const successMessage = ref(route.query.successMessage);
 const auth = authStore()
+const defaultPiniaStore = defaultStore()
 await auth.logout()
 
 const handleSubmit = async () => {
     try {
+        defaultPiniaStore.setLoading(true)
         if (!email || !password) {
             errorMessage.value = 'Preencha todos os campos.'
             return
@@ -125,6 +122,8 @@ const handleSubmit = async () => {
         await navigateTo('/home')
     } catch (error) {
         errorMessage.value = 'Erro no login. Verifique suas credenciais.'
+    }finally{
+        defaultPiniaStore.setLoading(false)
     }
 };
 

@@ -35,14 +35,15 @@
     @confirm="deleteDocument(currentElement)"
     @close="close()"
     >
-
     </ModalConfirmDelete>
 
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
+import { useMyFetch} from '@/composables/useMyFetch'
 import { type Documents } from '@/models/Documents/List'
+import { useNotificationStore } from '@/stores/notification'
 import { TrashIcon } from '@heroicons/vue/20/solid'
 import {defaultStore} from '@/stores/default'
 const defaultStorePinia = defaultStore()
@@ -52,20 +53,18 @@ const props = defineProps({
 })
 const isOpenModalDelete = ref(false)
 const listDocuments = ref<Documents[]>([])
-const auth = authStore()
+const notification = useNotificationStore()
 let currentElement = ref(0)
 const getList = async () => {
     try {
         setLoading(true)
-        const token = auth.token
-        const response = await $fetch('/api/documents/list',{
-            headers: {
-                "Authorization" :"bearer "+token
-            }
+        const response = await useMyFetch('/api/documents/list',{
+            method: 'GET',
         }) as Documents[]
         listDocuments.value = response
     } catch (error) {
-        clearError({ redirect: '/login?message=Token expirado' })
+        console.error(error)
+        notification.addNotification({ type: 'error', message: 'Erro ao buscar documentos' })
     }finally{
         setLoading(false)
     }
@@ -78,16 +77,12 @@ const close = async () => {
 const deleteDocument = async (documentId: number) => {
     try {
         setLoading(true)
-        const token = auth.token
         try{
-            await $fetch(`/api/documents/${documentId}`, {
+            await useMyFetch(`/api/documents/${documentId}`, {
             method: 'DELETE',
-            headers: {
-                "Authorization" :"bearer "+token
-            }
             })
         }catch(error){
-            clearError({ redirect: '/login?message=Token expirado' })
+            notification.addNotification({ type: 'error', message: 'Erro ao excluir documento' })
         }
 
         await getList()
