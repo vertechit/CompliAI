@@ -64,12 +64,12 @@
                             @click="navigateTo('/login')"
                             custom="flex w-full justify-center rounded-lg bg-white
                             !py-1.5
+                            !text-black
                                  text-sm font-semibold leading-6 text-sm text-black font-semibold leading-6
                         text-blue-600 border border-blue-600 shadow-sm hover:shadow-md hover:border-blue-800 hover:text-blue-800" 
                             label="Voltar" 
 
                         />
-                  
                     <div class="text-red-500">{{ errorMessage }}</div>
                   
                 </div>

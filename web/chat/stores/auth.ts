@@ -55,7 +55,9 @@ export const authStore = defineStore('authStore', {
       async logout(){
         this.token = null
         const tokenCookie = useCookie('token')
+        const loginCookie = useCookie('login')
         tokenCookie.value = null
+        loginCookie.value = null
       }
 
     },

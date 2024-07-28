@@ -19,63 +19,61 @@
 })
   import {nextTick} from 'vue'
   import Messages from '@/models/Message'
+  import { useNotificationStore } from '@/stores/notification'
+  import { useMyFetch } from '@/composables/useMyFetch';
   import FooterInputMensages from '@/components/footer/inputMensages.vue'
   import cMessages from '@/components/messages.vue'
   import {defaultStore} from '@/stores/default'
-  import { authStore} from '@/stores/auth';
+
   const route = useRoute()
-  const auth = authStore()
+  const notification = useNotificationStore()
   const chatContainer: Ref<HTMLElement | null> = ref(null);
   const defaultStorePinia = defaultStore()
   const MessagesModel = ref(new Messages())
 
   const chatId = route.params.id;
-  try{
-    let result = [] as any[];
-    result = await $fetch(`/api/chathistory/${chatId}`,{
-        method:'GET',
-        headers: {
-          "Authorization" :"bearer "+auth.token
-        }
-      }) as []
-
-      result.reverse()
-
-if(result){
-  for (let i in result){
-    if (result[i].tipo === 1){
-      MessagesModel.value.addMessage({date: result[i].criado ,id: result[i].chathistory_id,type:'user',userId:1,message: result[i].mensagem})
-    }else{
-      MessagesModel.value.addMessage({date: result[i].criado ,id: result[i].chathistory_id,type:'response',userId:0,message: result[i].mensagem})
-    }
-    
-  }
-}
-
-  }catch(error){
-    clearError({ redirect: '/login?message=Token expirado' })
-  }
+  const getChatHistory = async () => {
+    try{
+      let result = [] as any[];
+      result = await useMyFetch(`/api/chathistory/${chatId}`,{
+          method:'GET',
+        }) as []
   
+        result.reverse()
+      if(result){
+        for (let i in result){
+          if (result[i].tipo === 1){
+            MessagesModel.value.addMessage({date: result[i].criado ,id: result[i].chathistory_id,type:'user',userId:1,message: result[i].mensagem} as any)
+          }else{
+            MessagesModel.value.addMessage({date: result[i].criado ,id: result[i].chathistory_id,type:'response',userId:0,message: result[i].mensagem} as any)
+          }
+          
+        }
+      }
+  
+    }catch(error){
+      console.error(error)
+      notification.addNotification({ type: 'error', message: 'Erro ao buscar mensagens' })
+    }
+  }
   const submit = async (message: string) => {
     setLoading(true)
     try {
-      MessagesModel.value.addMessage({date:'',id:'',type:'user',userId:1,message})
+      MessagesModel.value.addMessage({date:'',id:'',type:'user',userId:1,message} as any)
       MessagesModel.value.addDotsLoading()
-      let result = await $fetch(`/api/chain/${chatId}`,{
+      let result = await useMyFetch(`/api/chain/${chatId}`,{
         method:'POST',
         timeout: 300000,
-        headers: {
-          "Authorization" :"bearer "+auth.token
-        },
         body:{
           "HumamMessage": message,
         }
       }) as { AiMessage: string}
       await MessagesModel.value.removeDotLoading()
-      MessagesModel.value.addMessage({date:'',id:'',type:'response',userId:0,message:result.AiMessage})
+      MessagesModel.value.addMessage({date:'',id:'',type:'response',userId:0,message:result.AiMessage} as any)
     } catch (error) {
-      console.log(error)
+      console.error(error)
       await MessagesModel.value.removeDotLoading()
+      notification.addNotification({ type: 'error', message: 'Erro ao enviar mensagem' })
     }finally{
       setLoading(false)
     }
@@ -84,22 +82,17 @@ if(result){
   const setLoading = (loading:boolean) => {
     defaultStorePinia.setLoading(loading)
   }
-
-  async function wait(ms:number) {
-    return new Promise((resolve)=>{
-      setTimeout(resolve,ms)
-    })
-  }
   watch(MessagesModel.value.listMensage,async()=> {
     await nextTick();
     scrollToBottom();
   })
-const scrollToBottom = () => {
-  if (chatContainer.value) {
-    chatContainer.value.scrollTop = chatContainer.value.scrollHeight ;
-  }
-};
+  const scrollToBottom = () => {
+    if (chatContainer.value) {
+      chatContainer.value.scrollTop = chatContainer.value.scrollHeight ;
+    }
+  };
 onMounted(scrollToBottom);
+onMounted(getChatHistory)
 
 </script>
 
