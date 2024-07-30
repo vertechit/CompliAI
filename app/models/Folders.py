@@ -28,7 +28,7 @@ class FolderPermissions(peewee.Model):
     folderperm_id = peewee.AutoField(primary_key=True)
     user_id = peewee.ForeignKeyField(User, backref='user')
     role  = peewee.IntegerField(default= 2)
-    folder_id = peewee.ForeignKeyField(Folders, backref='folders')
+    folder_id = peewee.ForeignKeyField(Folders, backref='permissions')
     created = peewee.DateField(default=datetime.now())
     class Meta:
         database = db

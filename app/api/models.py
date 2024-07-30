@@ -58,7 +58,6 @@ class PermissionObj(BaseModel):
     folderperm_id: int
     user_id: int
     role: int
-    folder_id: int
     created: datetime
     
 class PastaFilhoObj(BaseModel):

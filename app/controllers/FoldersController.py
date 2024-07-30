@@ -137,6 +137,6 @@ def list_permission(folder_id: int) -> List[FolderPermissions]:
     folder = None
     array = []
     folder = Folders.select().where((Folders.folder_id == folder_id)).first()
-    newPerm = (folder.folder_id, folder.path, folder.descr, folder.user_id, folder.created, folder.ar_folder_id,[(perm.folderperm_id, perm.user_id, perm.role, perm.folder_id, perm.created) for perm in folder.folders])
+    newPerm = (folder.folder_id, folder.path, folder.descr, folder.user_id, folder.created, folder.ar_folder_id,[(perm.folderperm_id, perm.user_id, perm.role, perm.created) for perm in folder.permissions])
     array.append(newPerm)
     return array
