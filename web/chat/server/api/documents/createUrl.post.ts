@@ -14,7 +14,8 @@ export default defineEventHandler(async (e) => {
             body: {
                 titulo,
                 description,
-                url
+                url,
+                folder_id: 1
             },
             timeout: 10000,
         });
