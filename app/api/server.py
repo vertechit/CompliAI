@@ -268,6 +268,6 @@ def lista_permissao_api(current_user: Annotated[CurrentUser, Depends(get_current
     if len(permissoes) == 0:
         return None
     for perm in permissoes:
-        permissions = [PermissionObj(folderperm_id=permLoop[0], user_id=permLoop[1].user_id, role=permLoop[2], folder_id=permLoop[3], created=permLoop[4]) for permLoop in perm[6]]
+        permissions = [PermissionObj(folderperm_id=permLoop[0], user_id=permLoop[1].user_id, role=permLoop[2], created=permLoop[3]) for permLoop in perm[6]]
         ret.append(PastaPermissionObj(folder_id=perm[0], path=perm[1], descr=perm[2], user_id=perm[3].user_id, created=perm[4], ar_folder_id=perm[5], permissions=permissions))
     return ret

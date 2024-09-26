@@ -5,7 +5,7 @@ export default defineEventHandler(async (e) => {
     try {
        const token = getRequestHeader(e, 'Authorization');
        const { baseURL}  = useRuntimeConfig().public
-       const data = await $fetch(`/listDocument`, {
+       const data = await $fetch(`/listDocument?folder_id=1`, {
           baseURL: baseURL,
           method: 'GET',
           headers: {
